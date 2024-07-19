@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: drawing_contest
+
+  config:
+    import: env.properties
+
+  datasource:
+    url: jdbc:mysql://${DB_URL}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  security:
+    jwt:
+      secret-key: ${JWT_SECRET_KEY}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+server:
+  port: 8080
