@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -25,16 +26,27 @@ public class RestExceptionHandler {
                 .body(restErrorMessage);
     }
 
-//    @ExceptionHandler(RuntimeException.class)
-//    private ResponseEntity<RestErrorMessage> runtimeExceptionHandler(
-//            RuntimeException e
-//    ) {
-//        log.info(String.valueOf(e.getCause()) + " | " + e.getMessage());
-//
-//        RestErrorMessage restErrorMessage = new RestErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, "something went wrong");
-//        return ResponseEntity
-//                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .body(restErrorMessage);
-//    }
+    @ExceptionHandler(RuntimeException.class)
+    private ResponseEntity<RestErrorMessage> runtimeExceptionHandler(
+            RuntimeException e
+    ) {
+        log.info(String.valueOf(e.getCause()) + " | " + e.getMessage());
+
+        RestErrorMessage restErrorMessage = new RestErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, "something went wrong");
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(restErrorMessage);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    private ResponseEntity<RestErrorMessage> badCredentialsExceptionHandler(
+            BadCredentialsException e
+    ) {
+        RestErrorMessage restErrorMessage = new RestErrorMessage(HttpStatus.UNAUTHORIZED, "bad credentials");
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(restErrorMessage);
+    }
 }

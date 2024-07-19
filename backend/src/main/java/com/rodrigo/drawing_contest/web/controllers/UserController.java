@@ -7,6 +7,7 @@ import com.rodrigo.drawing_contest.web.dtos.request.LoginRequestDto;
 import com.rodrigo.drawing_contest.web.dtos.request.RegisterRequestDto;
 import com.rodrigo.drawing_contest.web.dtos.response.LoginResponseDto;
 import jakarta.validation.Valid;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,11 +30,8 @@ public class UserController {
     public ResponseEntity<LoginResponseDto> login(@RequestBody @Valid LoginRequestDto dto) {
         var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword());
         var auth = this.authenticationManager.authenticate(usernamePasswordAuthenticationToken);
-
         var userDetails = (com.rodrigo.drawing_contest.models.security.UserDetails) auth.getPrincipal();
-        User user = userDetails.getUser();
-
-        String token = this.jwtService.createToken(user);
+        String token = this.jwtService.createToken(userDetails.getUser());
 
         return ResponseEntity.ok(new LoginResponseDto(token));
     }
@@ -46,7 +44,7 @@ public class UserController {
     }
 
     @GetMapping("/hello")
-    public String hello() {
-        return "hello world";
+    public ResponseEntity<String> hello() {
+        return ResponseEntity.ok("hello world");
     }
 }
