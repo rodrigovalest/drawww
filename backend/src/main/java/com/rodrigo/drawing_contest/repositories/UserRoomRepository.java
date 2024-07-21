@@ -1,5 +1,7 @@
 package com.rodrigo.drawing_contest.repositories;
 
+import com.rodrigo.drawing_contest.exceptions.RoomAlreadyExistsException;
+import com.rodrigo.drawing_contest.exceptions.UserIsAlreadyInARoomException;
 import com.rodrigo.drawing_contest.exceptions.UserIsNotInAnyRoomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -13,6 +15,8 @@ public class UserRoomRepository {
     public static final String USER_ROOM_KEY_PREFIX = "userRooms:";
 
     public void addUserToRoom(Long userId, Long roomId) {
+        if (Boolean.TRUE.equals(this.redisTemplate.hasKey(USER_ROOM_KEY_PREFIX + userId.toString())))
+            throw new UserIsAlreadyInARoomException("user {" + userId + "} is already in a room");
         this.redisTemplate.opsForValue().set(USER_ROOM_KEY_PREFIX + userId, roomId.toString());
     }
 
@@ -24,6 +28,8 @@ public class UserRoomRepository {
     }
 
     public void removeUserFromRoom(Long userId) {
-        this.redisTemplate.delete(USER_ROOM_KEY_PREFIX + userId.toString());
+        if (Boolean.FALSE.equals(this.redisTemplate.hasKey(USER_ROOM_KEY_PREFIX + userId)))
+            throw new UserIsNotInAnyRoomException("user { " + userId + " } is not in any room");
+        this.redisTemplate.delete(USER_ROOM_KEY_PREFIX + userId);
     }
 }

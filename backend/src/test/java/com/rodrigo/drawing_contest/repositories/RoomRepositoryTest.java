@@ -1,6 +1,6 @@
 package com.rodrigo.drawing_contest.repositories;
 
-import com.rodrigo.drawing_contest.configs.TestRedisConfig;
+import com.rodrigo.drawing_contest.config.TestRedisConfig;
 import com.rodrigo.drawing_contest.exceptions.InvalidRoomException;
 import com.rodrigo.drawing_contest.exceptions.RoomAlreadyExistsException;
 import com.rodrigo.drawing_contest.exceptions.RoomNotFoundException;
@@ -190,5 +190,11 @@ class RoomRepositoryTest {
         // Assert
         Assertions.assertThat(this.redisTemplate.hasKey(ROOM_KEY_PREFIX + roomId.toString()))
                 .isEqualTo(false);
+    }
+
+    @Test
+    public void deleteRoom_WithInexistentRoomId_ThrowsException() {
+        Assertions.assertThatThrownBy(() -> this.roomRepository.deleteRoom(123123L))
+                .isInstanceOf(RoomNotFoundException.class);
     }
 }

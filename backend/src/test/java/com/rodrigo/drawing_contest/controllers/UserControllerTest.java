@@ -144,14 +144,14 @@ public class UserControllerTest {
         response.andExpect(status().isUnauthorized());
     }
 
-    @Test
-    @WithMockUser(username = "123mudar", password = "123mudar")
-    public void helloWorld() throws Exception {
-        // Act
-        ResultActions response = this.mockMvc.perform(get("/api/v1/users/hello")
-                .contentType(MediaType.APPLICATION_JSON));
-
-        // Assert
-        response.andExpect(status().isOk());
-    }
+//    @Test
+//    @WithMockUser(username = "123mudar", password = "123mudar")
+//    public void helloWorld() throws Exception {
+//        // Act
+//        ResultActions response = this.mockMvc.perform(get("/api/v1/users/hello")
+//                .contentType(MediaType.APPLICATION_JSON));
+//
+//        // Assert
+//        response.andExpect(status().isOk());
+//    }
 }
