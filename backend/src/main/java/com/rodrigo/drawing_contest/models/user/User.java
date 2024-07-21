@@ -1,4 +1,4 @@
-package com.rodrigo.drawing_contest.models.entities;
+package com.rodrigo.drawing_contest.models.user;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -24,7 +24,7 @@ public class User {
     @Column(name = "username", nullable = false, unique = true)
     private String username;
 
-    @Column(name = "password",nullable = false)
+    @Column(name = "password", nullable = false)
     private String password;
 
     @CreationTimestamp

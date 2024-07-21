@@ -1,6 +1,6 @@
 package com.rodrigo.drawing_contest.repositories;
 
-import com.rodrigo.drawing_contest.models.entities.User;
+import com.rodrigo.drawing_contest.models.user.User;
 import lombok.RequiredArgsConstructor;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -10,7 +10,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import java.util.Optional;
 
-@RequiredArgsConstructor
 @DataJpaTest
 public class UserRepositoryTest {
 

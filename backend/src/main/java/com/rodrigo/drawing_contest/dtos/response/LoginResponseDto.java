@@ -1,4 +1,4 @@
-package com.rodrigo.drawing_contest.web.dtos.response;
+package com.rodrigo.drawing_contest.dtos.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

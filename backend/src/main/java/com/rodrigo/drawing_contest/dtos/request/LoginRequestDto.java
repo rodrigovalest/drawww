@@ -1,4 +1,4 @@
-package com.rodrigo.drawing_contest.web.dtos.request;
+package com.rodrigo.drawing_contest.dtos.request;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;

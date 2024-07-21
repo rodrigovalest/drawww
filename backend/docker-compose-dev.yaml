@@ -9,3 +9,8 @@ services:
       MYSQL_USER: 123mudar
       MYSQL_PASSWORD: 123mudar
       MYSQL_DATABASE: dbdrawingcontest
+  redis:
+    image: redis:7.2
+    container_name: redis
+    ports:
+      - "6379:6379"

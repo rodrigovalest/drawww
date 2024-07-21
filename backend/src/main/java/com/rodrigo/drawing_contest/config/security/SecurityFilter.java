@@ -1,6 +1,6 @@
 package com.rodrigo.drawing_contest.config.security;
 
-import com.rodrigo.drawing_contest.models.security.UserDetails;
+import com.rodrigo.drawing_contest.models.user.UserDetails;
 import com.rodrigo.drawing_contest.services.JwtService;
 import com.rodrigo.drawing_contest.services.UserService;
 import jakarta.servlet.FilterChain;

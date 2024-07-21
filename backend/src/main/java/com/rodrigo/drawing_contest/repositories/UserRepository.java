@@ -1,6 +1,6 @@
 package com.rodrigo.drawing_contest.repositories;
 
-import com.rodrigo.drawing_contest.models.entities.User;
+import com.rodrigo.drawing_contest.models.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

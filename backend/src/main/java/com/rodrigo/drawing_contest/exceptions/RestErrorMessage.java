@@ -1,4 +1,4 @@
-package com.rodrigo.drawing_contest.web.exceptions;
+package com.rodrigo.drawing_contest.exceptions;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;

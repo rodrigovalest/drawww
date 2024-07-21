@@ -1,13 +1,11 @@
-package com.rodrigo.drawing_contest.models.security;
+package com.rodrigo.drawing_contest.models.user;
 
-import com.rodrigo.drawing_contest.models.entities.User;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 @RequiredArgsConstructor
 @Getter

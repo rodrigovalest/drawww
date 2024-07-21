@@ -1,7 +1,7 @@
 package com.rodrigo.drawing_contest.services;
 
-import com.rodrigo.drawing_contest.models.entities.User;
-import com.rodrigo.drawing_contest.models.security.UserDetails;
+import com.rodrigo.drawing_contest.models.user.User;
+import com.rodrigo.drawing_contest.models.user.UserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
