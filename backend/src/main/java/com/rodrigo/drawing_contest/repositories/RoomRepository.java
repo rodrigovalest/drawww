@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.UUID;
+
 @RequiredArgsConstructor
 @Repository
 public class RoomRepository {
@@ -22,14 +24,14 @@ public class RoomRepository {
         this.redisTemplate.opsForValue().set(ROOM_KEY_PREFIX + room.getId().toString(), room);
     }
 
-    public Room findRoom(Long roomId) {
+    public Room findRoom(UUID roomId) {
         Room room = this.redisTemplate.opsForValue().get(ROOM_KEY_PREFIX + roomId.toString());
         if (room == null)
             throw new RoomNotFoundException("room with id {" + roomId + "} not found");
         return room;
     }
 
-    public void updateRoom(Long roomId, Room room) {
+    public void updateRoom(UUID roomId, Room room) {
         this.validateRoom(room);
         if (Boolean.FALSE.equals(this.redisTemplate.hasKey(ROOM_KEY_PREFIX + roomId.toString())))
             throw new RoomNotFoundException("room with id {" + roomId + "} not found");
@@ -37,7 +39,7 @@ public class RoomRepository {
         this.redisTemplate.opsForValue().set(ROOM_KEY_PREFIX + roomId, room);
     }
 
-    public void deleteRoom(Long roomId) {
+    public void deleteRoom(UUID roomId) {
         if (Boolean.FALSE.equals(this.redisTemplate.hasKey(ROOM_KEY_PREFIX + roomId.toString())))
             throw new RoomNotFoundException("room with id {" + roomId + "} not found");
         this.redisTemplate.delete(ROOM_KEY_PREFIX + roomId.toString());
@@ -46,8 +48,6 @@ public class RoomRepository {
     private void validateRoom(Room room) {
         if (room.getId() == null)
             throw new InvalidRoomException("room ID cannot be null");
-        if (room.getPassword() == null || room.getPassword().isEmpty())
-            throw new InvalidRoomException("room password cannot be null or empty");
         if (room.getAccessType() == null)
             throw new InvalidRoomException("room access type cannot be null");
         if (room.getStatus() == null)

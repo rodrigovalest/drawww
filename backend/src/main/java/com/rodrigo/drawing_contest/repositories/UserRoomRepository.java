@@ -1,6 +1,5 @@
 package com.rodrigo.drawing_contest.repositories;
 
-import com.rodrigo.drawing_contest.exceptions.RoomAlreadyExistsException;
 import com.rodrigo.drawing_contest.exceptions.UserIsAlreadyInARoomException;
 import com.rodrigo.drawing_contest.exceptions.UserIsNotInAnyRoomException;
 import lombok.RequiredArgsConstructor;
@@ -31,5 +30,9 @@ public class UserRoomRepository {
         if (Boolean.FALSE.equals(this.redisTemplate.hasKey(USER_ROOM_KEY_PREFIX + userId)))
             throw new UserIsNotInAnyRoomException("user { " + userId + " } is not in any room");
         this.redisTemplate.delete(USER_ROOM_KEY_PREFIX + userId);
+    }
+
+    public boolean userIsInAnyRoom(Long userId) {
+        return this.redisTemplate.hasKey(USER_ROOM_KEY_PREFIX + userId);
     }
 }
