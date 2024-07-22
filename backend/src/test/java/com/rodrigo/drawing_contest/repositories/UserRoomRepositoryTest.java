@@ -120,4 +120,30 @@ public class UserRoomRepositoryTest {
         Assertions.assertThatThrownBy(() -> this.userRoomRepository.removeUserFromRoom(123344L))
                 .isInstanceOf(UserIsNotInAnyRoomException.class);
     }
+
+    @Test
+    public void userIsInAnyRoom_WithValidUserId_ReturnsTrue() {
+        // Arrange
+        Long userId = 23L;
+        Long roomId = 1234L;
+        this.redisTemplate.opsForValue().set(USER_ROOM_KEY_PREFIX + userId, roomId.toString());
+
+        // Act
+        boolean sut = this.userRoomRepository.userIsInAnyRoom(userId);
+
+        // Assert
+        Assertions.assertThat(sut).isTrue();
+    }
+
+    @Test
+    public void userIsInAnyRoom_WithUserNotInAnyRoom_ReturnsFalse() {
+        // Arrange
+        Long userId = 23L;
+
+        // Act
+        boolean sut = this.userRoomRepository.userIsInAnyRoom(userId);
+
+        // Assert
+        Assertions.assertThat(sut).isFalse();
+    }
 }

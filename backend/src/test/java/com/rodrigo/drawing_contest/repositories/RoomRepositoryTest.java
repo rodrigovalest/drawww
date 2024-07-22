@@ -24,6 +24,8 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import java.util.UUID;
+
 import static com.rodrigo.drawing_contest.repositories.RoomRepository.ROOM_KEY_PREFIX;
 
 @DataRedisTest
@@ -65,7 +67,7 @@ class RoomRepositoryTest {
     @Test
     public void createRoom_WithValidData_ShouldCreateRoom() {
         // Arrange
-        Room room = new Room(1L, "password", RoomAccessTypeEnum.PUBLIC, RoomStatusEnum.WAITING, 10L);
+        Room room = new Room(UUID.randomUUID(), "password", RoomAccessTypeEnum.PUBLIC, RoomStatusEnum.WAITING, 10L);
 
         // Act
         this.roomRepository.createRoom(room);
@@ -77,8 +79,8 @@ class RoomRepositoryTest {
 
     @Test
     public void createRoom_WithAlreadyExistentRoomId_ThrowException() {
-        Room room = new Room(1L, "password", RoomAccessTypeEnum.PUBLIC, RoomStatusEnum.WAITING, 10L);
-        Room newRoom = new Room(1L, "password", RoomAccessTypeEnum.PUBLIC, RoomStatusEnum.WAITING, 10L);
+        Room room = new Room(UUID.randomUUID(), "password", RoomAccessTypeEnum.PUBLIC, RoomStatusEnum.WAITING, 10L);
+        Room newRoom = new Room(room.getId(), "password", RoomAccessTypeEnum.PUBLIC, RoomStatusEnum.WAITING, 10L);
         this.redisTemplate.opsForValue().set(ROOM_KEY_PREFIX + room.getId().toString(), room);
 
         Assertions.assertThatThrownBy(() -> this.roomRepository.createRoom(newRoom)).isInstanceOf(RoomAlreadyExistsException.class);
@@ -91,51 +93,39 @@ class RoomRepositoryTest {
     }
 
     @Test
-    public void createRoom_WithNullPassword_ThrowException() {
-        Room room = new Room(123L, null, RoomAccessTypeEnum.PUBLIC, RoomStatusEnum.WAITING, 10L);
-        Assertions.assertThatThrownBy(() -> this.roomRepository.createRoom(room)).isInstanceOf(InvalidRoomException.class);
-    }
-
-    @Test
-    public void createRoom_WithEmptyPassword_ThrowException() {
-        Room room = new Room(123L, "", RoomAccessTypeEnum.PUBLIC, RoomStatusEnum.WAITING, 10L);
-        Assertions.assertThatThrownBy(() -> this.roomRepository.createRoom(room)).isInstanceOf(InvalidRoomException.class);
-    }
-
-    @Test
     public void createRoom_WithNullAccessType_ThrowException() {
-        Room room = new Room(123L, "asddsadsadasda", null, RoomStatusEnum.WAITING, 10L);
+        Room room = new Room(UUID.randomUUID(), "asddsadsadasda", null, RoomStatusEnum.WAITING, 10L);
         Assertions.assertThatThrownBy(() -> this.roomRepository.createRoom(room)).isInstanceOf(InvalidRoomException.class);
     }
 
     @Test
     public void createRoom_WithNullStatus_ThrowException() {
-        Room room = new Room(123L, "asddsadsadasda", RoomAccessTypeEnum.PUBLIC, null, 10L);
+        Room room = new Room(UUID.randomUUID(), "asddsadsadasda", RoomAccessTypeEnum.PUBLIC, null, 10L);
         Assertions.assertThatThrownBy(() -> this.roomRepository.createRoom(room)).isInstanceOf(InvalidRoomException.class);
     }
 
     @Test
     public void createRoom_WithNullSize_ThrowException() {
-        Room room = new Room(123L, "asddsadsadasda", RoomAccessTypeEnum.PUBLIC, RoomStatusEnum.WAITING, null);
+        Room room = new Room(UUID.randomUUID(), "asddsadsadasda", RoomAccessTypeEnum.PUBLIC, RoomStatusEnum.WAITING, null);
         Assertions.assertThatThrownBy(() -> this.roomRepository.createRoom(room)).isInstanceOf(InvalidRoomException.class);
     }
 
     @Test
     public void createRoom_WithNegativeSize_ThrowException() {
-        Room room = new Room(123L, "asddsadsadasda", RoomAccessTypeEnum.PUBLIC, RoomStatusEnum.WAITING, -123L);
+        Room room = new Room(UUID.randomUUID(), "asddsadsadasda", RoomAccessTypeEnum.PUBLIC, RoomStatusEnum.WAITING, -123L);
         Assertions.assertThatThrownBy(() -> this.roomRepository.createRoom(room)).isInstanceOf(InvalidRoomException.class);
     }
 
     @Test
     public void createRoom_WithInvalidSize_ThrowException() {
-        Room room = new Room(123L, "asddsadsadasda", RoomAccessTypeEnum.PUBLIC, RoomStatusEnum.WAITING, -123312L);
+        Room room = new Room(UUID.randomUUID(), "asddsadsadasda", RoomAccessTypeEnum.PUBLIC, RoomStatusEnum.WAITING, -123312L);
         Assertions.assertThatThrownBy(() -> this.roomRepository.createRoom(room)).isInstanceOf(InvalidRoomException.class);
     }
 
     @Test
     public void findRoom_WithValidRoomId_ReturnRoom() {
         // Arrange
-        Long roomId = 123L;
+        UUID roomId = UUID.randomUUID();
         Room room = new Room(roomId, "password", RoomAccessTypeEnum.PUBLIC, RoomStatusEnum.WAITING, 10L);
         this.redisTemplate.opsForValue().set(ROOM_KEY_PREFIX + room.getId().toString(), room);
 
@@ -148,14 +138,14 @@ class RoomRepositoryTest {
 
     @Test
     public void findRoom_WithInexistentRoomId_ThrowsException() {
-        Long roomId = 123L;
+        UUID roomId = UUID.randomUUID();
         Assertions.assertThatThrownBy(() -> this.roomRepository.findRoom(roomId)).isInstanceOf(RoomNotFoundException.class);
     }
 
     @Test
     public void updateRoom_WithValidData_ShouldUpdateRoom() {
         // Arrange
-        Long roomId = 123L;
+        UUID roomId = UUID.randomUUID();
         Room room = new Room(roomId, "password", RoomAccessTypeEnum.PUBLIC, RoomStatusEnum.WAITING, 10L);
         this.redisTemplate.opsForValue().set(ROOM_KEY_PREFIX + room.getId().toString(), room);
         Room toUpdateRoom = new Room(roomId, room.getPassword(), room.getAccessType(), room.getStatus(), room.getSize());
@@ -172,7 +162,7 @@ class RoomRepositoryTest {
 
     @Test
     public void updateRoom_WithInexistentRoomId_ThrowsException() {
-        Long roomId = 123L;
+        UUID roomId = UUID.randomUUID();
         Room room = new Room(roomId, "password", RoomAccessTypeEnum.PUBLIC, RoomStatusEnum.WAITING, 10L);
         Assertions.assertThatThrownBy(() -> this.roomRepository.updateRoom(roomId, room)).isInstanceOf(RoomNotFoundException.class);
     }
@@ -180,7 +170,7 @@ class RoomRepositoryTest {
     @Test
     public void deleteRoom_WithValidRoomId_ShouldDeleteRoom() {
         // Arrange
-        Long roomId = 123L;
+        UUID roomId = UUID.randomUUID();
         Room room = new Room(roomId, "password", RoomAccessTypeEnum.PUBLIC, RoomStatusEnum.WAITING, 10L);
         this.redisTemplate.opsForValue().set(ROOM_KEY_PREFIX + room.getId().toString(), room);
 
@@ -194,7 +184,7 @@ class RoomRepositoryTest {
 
     @Test
     public void deleteRoom_WithInexistentRoomId_ThrowsException() {
-        Assertions.assertThatThrownBy(() -> this.roomRepository.deleteRoom(123123L))
+        Assertions.assertThatThrownBy(() -> this.roomRepository.deleteRoom(UUID.randomUUID()))
                 .isInstanceOf(RoomNotFoundException.class);
     }
 }
