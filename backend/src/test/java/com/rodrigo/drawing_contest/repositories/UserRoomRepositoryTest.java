@@ -19,6 +19,8 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import java.util.UUID;
+
 import static com.rodrigo.drawing_contest.repositories.UserRoomRepository.USER_ROOM_KEY_PREFIX;
 
 @DataRedisTest
@@ -61,44 +63,55 @@ public class UserRoomRepositoryTest {
     public void addUserToRoom_WithValidData_ShouldAddUserToRoom() {
         // Arrange
         Long userId = 23L;
-        Long roomId = 1234L;
+        UUID roomId = UUID.randomUUID();
 
         // Act
         this.userRoomRepository.addUserToRoom(userId, roomId);
 
         // Assert
-        Long sut = Long.parseLong(this.redisTemplate.opsForValue().get(USER_ROOM_KEY_PREFIX + userId));
+        UUID sut = UUID.fromString(this.redisTemplate.opsForValue().get(USER_ROOM_KEY_PREFIX + userId));
         Assertions.assertThat(sut).isEqualTo(roomId);
     }
 
     @Test
-    public void addUserToRoom_WithUserWhoIsAlreadyInARoom_ThrowsException() {
+    public void addUserToRoom_WithUserWhoIsAlreadyInARoom_ShouldOverrideRoomId() {
+        // Arrange
         Long userId = 23L;
-        Long roomId = 1234L;
-        this.redisTemplate.opsForValue().set(USER_ROOM_KEY_PREFIX + userId, String.valueOf(3452L));
+        UUID roomId = UUID.randomUUID();
+        this.redisTemplate.opsForValue().set(USER_ROOM_KEY_PREFIX + userId, String.valueOf(UUID.randomUUID()));
 
-        Assertions.assertThatThrownBy(() -> this.userRoomRepository.addUserToRoom(userId, roomId))
-                .isInstanceOf(UserIsAlreadyInARoomException.class);
+        // Act
+        this.userRoomRepository.addUserToRoom(userId, roomId);
+
+        // Assert
+        UUID sut = UUID.fromString(this.redisTemplate.opsForValue().get(USER_ROOM_KEY_PREFIX + userId));
+        Assertions.assertThat(sut).isEqualTo(roomId);
     }
 
     @Test
     public void getRoomIdOfUser_WithValidData_ReturnsLong() {
         // Arrange
         Long userId = 23L;
-        Long roomId = 1234L;
+        UUID roomId = UUID.randomUUID();
         this.redisTemplate.opsForValue().set(USER_ROOM_KEY_PREFIX + userId, roomId.toString());
 
         // Act
-        Long sut = this.userRoomRepository.getRoomIdOfUser(userId);
+        UUID sut = this.userRoomRepository.getRoomIdOfUser(userId);
 
         // Assert
         Assertions.assertThat(sut).isEqualTo(roomId);
     }
 
     @Test
-    public void getRoomIdOfUser_WithUserNotInAnyRoom_ThrowsException() {
-        Assertions.assertThatThrownBy(() -> this.userRoomRepository.getRoomIdOfUser(123344L))
-                .isInstanceOf(UserIsNotInAnyRoomException.class);
+    public void getRoomIdOfUser_WithUserNotInAnyRoom_ReturnsNull() {
+        // Arrange
+        Long userId = 23L;
+
+        // Act
+        UUID sut = this.userRoomRepository.getRoomIdOfUser(userId);
+
+        // Assert
+        Assertions.assertThat(sut).isNull();
     }
 
     @Test
@@ -116,34 +129,14 @@ public class UserRoomRepositoryTest {
     }
 
     @Test
-    public void removeUserFromRoom_WithUserNotInAnyRoom_ThrowsException() {
-        Assertions.assertThatThrownBy(() -> this.userRoomRepository.removeUserFromRoom(123344L))
-                .isInstanceOf(UserIsNotInAnyRoomException.class);
-    }
-
-    @Test
-    public void userIsInAnyRoom_WithValidUserId_ReturnsTrue() {
-        // Arrange
-        Long userId = 23L;
-        Long roomId = 1234L;
-        this.redisTemplate.opsForValue().set(USER_ROOM_KEY_PREFIX + userId, roomId.toString());
-
-        // Act
-        boolean sut = this.userRoomRepository.userIsInAnyRoom(userId);
-
-        // Assert
-        Assertions.assertThat(sut).isTrue();
-    }
-
-    @Test
-    public void userIsInAnyRoom_WithUserNotInAnyRoom_ReturnsFalse() {
+    public void removeUserFromRoom_WithInexistentUserId_ShouldRemoveNothing() {
         // Arrange
         Long userId = 23L;
 
         // Act
-        boolean sut = this.userRoomRepository.userIsInAnyRoom(userId);
+        this.userRoomRepository.removeUserFromRoom(userId);
 
         // Assert
-        Assertions.assertThat(sut).isFalse();
+        Assertions.assertThat(this.redisTemplate.hasKey(USER_ROOM_KEY_PREFIX + userId)).isFalse();
     }
 }
