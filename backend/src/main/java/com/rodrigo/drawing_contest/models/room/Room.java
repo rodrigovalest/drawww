@@ -7,12 +7,13 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class Room {
-    private Long id;
+    private UUID id;
     private String password;
     private RoomAccessTypeEnum accessType;
     private RoomStatusEnum status;
