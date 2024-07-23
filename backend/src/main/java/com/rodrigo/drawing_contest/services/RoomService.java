@@ -51,7 +51,7 @@ public class RoomService {
 
         Room room = this.roomRepository.findRoom(roomId);
         if (room == null || room.getAccessType() != RoomAccessTypeEnum.PRIVATE)
-            throw new RoomNotFoundException("room with id {" + roomId + "} not found");
+            throw new EntityNotFoundException("room with id {" + roomId + "} not found");
 
         if (!Objects.equals(room.getPassword(), roomPassword))
             throw new RoomPasswordDontMatchException("room password do not match");
@@ -73,7 +73,7 @@ public class RoomService {
 
         Room room = this.roomRepository.findRoom(roomId);
         if (room == null)
-            throw new RoomNotFoundException("room with id {" + roomId + "} not found");
+            throw new EntityNotFoundException("room with id {" + roomId + "} not found");
 
         room.removeUser(user.getId());
         this.roomRepository.saveRoom(room);
@@ -83,11 +83,17 @@ public class RoomService {
     public void deleteRoom(UUID roomId) {
         Room room = this.roomRepository.findRoom(roomId);
         if (room == null)
-            throw new RoomNotFoundException("room with id {" + roomId + "} not found");
+            throw new EntityNotFoundException("room with id {" + roomId + "} not found");
 
         for (UserRedis user : room.getUsers())
             this.userRoomRepository.removeUserFromRoom(user.getId());
 
         this.roomRepository.deleteRoom(roomId);
+    }
+
+    public Room findRoomById(UUID roomId) {
+        Room room = this.roomRepository.findRoom(roomId);
+        if (room == null) throw new EntityNotFoundException("room with id {" + roomId + "} not found");
+        return room;
     }
 }

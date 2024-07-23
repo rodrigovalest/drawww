@@ -83,18 +83,6 @@ public class RestExceptionHandler {
                 .body(restErrorMessage);
     }
 
-
-    @ExceptionHandler(RoomNotFoundException.class)
-    private ResponseEntity<RestErrorMessage> roomNotFoundExceptionHandler(
-            RoomNotFoundException e
-    ) {
-        RestErrorMessage restErrorMessage = new RestErrorMessage(HttpStatus.NOT_FOUND, e.getMessage());
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(restErrorMessage);
-    }
-
     @ExceptionHandler(RoomPasswordDontMatchException.class)
     private ResponseEntity<RestErrorMessage> roomPasswordDontMatchExceptionHandler(
             RoomPasswordDontMatchException e

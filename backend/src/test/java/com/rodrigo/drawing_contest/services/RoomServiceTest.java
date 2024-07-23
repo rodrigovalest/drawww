@@ -180,7 +180,7 @@ public class RoomServiceTest {
         when(this.roomRepository.findRoom(roomId)).thenReturn(null);
 
         Assertions.assertThatThrownBy(() -> this.roomService.enterInPrivateRoom(user, roomId, roomPassword))
-                .isInstanceOf(RoomNotFoundException.class);
+                .isInstanceOf(EntityNotFoundException.class);
 
         verify(this.userRoomRepository, times(1))
                 .getRoomIdOfUser(user.getId());
@@ -203,7 +203,7 @@ public class RoomServiceTest {
         when(this.roomRepository.findRoom(roomId)).thenReturn(room);
 
         Assertions.assertThatThrownBy(() -> this.roomService.enterInPrivateRoom(user, roomId, roomPassword))
-                .isInstanceOf(RoomNotFoundException.class);
+                .isInstanceOf(EntityNotFoundException.class);
 
         verify(this.userRoomRepository, times(1))
                 .getRoomIdOfUser(user.getId());
@@ -312,7 +312,7 @@ public class RoomServiceTest {
         when(this.roomRepository.findRoom(roomId)).thenReturn(null);
 
         Assertions.assertThatThrownBy(() -> this.roomService.leaveRoom(user))
-                .isInstanceOf(RoomNotFoundException.class);
+                .isInstanceOf(EntityNotFoundException.class);
 
         verify(this.userRoomRepository, times(1))
                 .getRoomIdOfUser(user.getId());
@@ -361,11 +361,46 @@ public class RoomServiceTest {
         when(this.roomRepository.findRoom(roomId)).thenReturn(null);
 
         Assertions.assertThatThrownBy(() -> this.roomService.deleteRoom(roomId))
-                        .isInstanceOf(RoomNotFoundException.class);
+                        .isInstanceOf(EntityNotFoundException.class);
 
         verify(this.roomRepository, times(1))
                 .findRoom(roomId);
         verify(this.userRoomRepository, times(0))
                 .removeUserFromRoom(anyLong());
+    }
+
+    @Test
+    public void findRoomById_WithValidRoomId_ReturnRoom() {
+        // Arrange
+        User user = new User(10L, "cleiton", "encryptedpassword", LocalDateTime.of(2024, 1, 15, 10, 30), LocalDateTime.of(2024, 1, 15, 10, 30));
+        User user1 = new User(11L, "rolmundo", "encryptedpassword", LocalDateTime.of(2024, 1, 15, 10, 30), LocalDateTime.of(2024, 1, 15, 10, 30));
+        User user2 = new User(12L, "tonio", "encryptedpassword", LocalDateTime.of(2024, 1, 15, 10, 30), LocalDateTime.of(2024, 1, 15, 10, 30));
+        User user3 = new User(13L, "fagner", "encryptedpassword", LocalDateTime.of(2024, 1, 15, 10, 30), LocalDateTime.of(2024, 1, 15, 10, 30));
+        UUID roomId = UUID.randomUUID();
+        Room room = new Room(roomId, null, RoomAccessTypeEnum.PRIVATE, RoomStatusEnum.WAITING, 10L);
+        room.addUser(new UserRedis(user.getId(), user.getUsername()));
+        room.addUser(new UserRedis(user1.getId(), user1.getUsername()));
+        room.addUser(new UserRedis(user2.getId(), user2.getUsername()));
+        room.addUser(new UserRedis(user3.getId(), user3.getUsername()));
+        when(this.roomRepository.findRoom(roomId)).thenReturn(room);
+
+        // Act
+        Room sut = this.roomService.findRoomById(roomId);
+
+        // Assert
+        Assertions.assertThat(sut).isNotNull();
+        Assertions.assertThat(sut).isEqualTo(room);
+    }
+
+    @Test
+    public void findRoomById_WithInexistentRoomId_ThrowsException() {
+        UUID roomId = UUID.randomUUID();
+        when(this.roomRepository.findRoom(roomId)).thenReturn(null);
+
+        Assertions.assertThatThrownBy(() -> this.roomService.findRoomById(roomId))
+                .isInstanceOf(EntityNotFoundException.class);
+
+        verify(this.roomRepository, times(1))
+                .findRoom(roomId);
     }
 }
