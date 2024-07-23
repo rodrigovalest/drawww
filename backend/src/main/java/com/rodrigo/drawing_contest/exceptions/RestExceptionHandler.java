@@ -82,4 +82,38 @@ public class RestExceptionHandler {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(restErrorMessage);
     }
+
+
+    @ExceptionHandler(RoomNotFoundException.class)
+    private ResponseEntity<RestErrorMessage> roomNotFoundExceptionHandler(
+            RoomNotFoundException e
+    ) {
+        RestErrorMessage restErrorMessage = new RestErrorMessage(HttpStatus.NOT_FOUND, e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(restErrorMessage);
+    }
+
+    @ExceptionHandler(RoomPasswordDontMatchException.class)
+    private ResponseEntity<RestErrorMessage> roomPasswordDontMatchExceptionHandler(
+            RoomPasswordDontMatchException e
+    ) {
+        RestErrorMessage restErrorMessage = new RestErrorMessage(HttpStatus.UNAUTHORIZED, e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(restErrorMessage);
+    }
+
+    @ExceptionHandler(RoomNotAvailable.class)
+    private ResponseEntity<RestErrorMessage> roomNotAvailableHandler(
+            RoomNotAvailable e
+    ) {
+        RestErrorMessage restErrorMessage = new RestErrorMessage(HttpStatus.SERVICE_UNAVAILABLE, e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.SERVICE_UNAVAILABLE)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(restErrorMessage);
+    }
 }
