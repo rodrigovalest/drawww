@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class EnterInRoomRequestDto {
-    private Long userId;
-    private String username;
+public class CreatePrivateRoomDto {
     private String password;
 }

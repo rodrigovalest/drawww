@@ -49,4 +49,37 @@ public class RestExceptionHandler {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(restErrorMessage);
     }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    private ResponseEntity<RestErrorMessage> entityNotFoundExceptionHandler(
+            EntityNotFoundException e
+    ) {
+        RestErrorMessage restErrorMessage = new RestErrorMessage(HttpStatus.NOT_FOUND, e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(restErrorMessage);
+    }
+
+    @ExceptionHandler(UsernameAlreadyUsedException.class)
+    private ResponseEntity<RestErrorMessage> usernameAlreadyUsedExceptionHandler(
+            UsernameAlreadyUsedException e
+    ) {
+        RestErrorMessage restErrorMessage = new RestErrorMessage(HttpStatus.CONFLICT, e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(restErrorMessage);
+    }
+
+    @ExceptionHandler(UserIsAlreadyInARoomException.class)
+    private ResponseEntity<RestErrorMessage> userIsAlreadyInARoomExceptionHandler(
+            UserIsAlreadyInARoomException e
+    ) {
+        RestErrorMessage restErrorMessage = new RestErrorMessage(HttpStatus.CONFLICT, e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(restErrorMessage);
+    }
 }
