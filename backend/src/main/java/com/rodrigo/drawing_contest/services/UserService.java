@@ -2,7 +2,7 @@ package com.rodrigo.drawing_contest.services;
 
 import com.rodrigo.drawing_contest.exceptions.EntityNotFoundException;
 import com.rodrigo.drawing_contest.exceptions.UsernameAlreadyUsedException;
-import com.rodrigo.drawing_contest.models.entities.User;
+import com.rodrigo.drawing_contest.models.user.User;
 import com.rodrigo.drawing_contest.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

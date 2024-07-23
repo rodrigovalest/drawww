@@ -1,7 +1,7 @@
 package com.rodrigo.drawing_contest.security;
 
-import com.rodrigo.drawing_contest.models.entities.User;
-import com.rodrigo.drawing_contest.models.security.UserDetails;
+import com.rodrigo.drawing_contest.models.user.User;
+import com.rodrigo.drawing_contest.models.user.UserDetails;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

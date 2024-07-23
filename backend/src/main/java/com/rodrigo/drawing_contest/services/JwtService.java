@@ -1,6 +1,6 @@
 package com.rodrigo.drawing_contest.services;
 
-import com.rodrigo.drawing_contest.models.entities.User;
+import com.rodrigo.drawing_contest.models.user.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;

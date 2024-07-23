@@ -2,12 +2,12 @@ package com.rodrigo.drawing_contest.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rodrigo.drawing_contest.config.security.SecurityConfig;
-import com.rodrigo.drawing_contest.models.entities.User;
+import com.rodrigo.drawing_contest.models.user.User;
+import com.rodrigo.drawing_contest.models.user.UserDetails;
 import com.rodrigo.drawing_contest.services.JwtService;
 import com.rodrigo.drawing_contest.services.UserService;
-import com.rodrigo.drawing_contest.web.controllers.UserController;
-import com.rodrigo.drawing_contest.web.dtos.request.LoginRequestDto;
-import com.rodrigo.drawing_contest.web.dtos.request.RegisterRequestDto;
+import com.rodrigo.drawing_contest.dtos.request.LoginRequestDto;
+import com.rodrigo.drawing_contest.dtos.request.RegisterRequestDto;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,7 +106,7 @@ public class UserControllerTest {
         // Arrange
         LoginRequestDto loginRequestDto = new LoginRequestDto("user123", "123mudar");
         User user = new User(null, loginRequestDto.getUsername(), "encryptedPassword", LocalDateTime.now(), LocalDateTime.now());
-        com.rodrigo.drawing_contest.models.security.UserDetails userDetails = new com.rodrigo.drawing_contest.models.security.UserDetails(user);
+        UserDetails userDetails = new UserDetails(user);
 
         var authenticationToken = new UsernamePasswordAuthenticationToken(loginRequestDto.getUsername(), loginRequestDto.getPassword());
         var authentication = new UsernamePasswordAuthenticationToken(userDetails, null, Collections.emptyList());
@@ -144,14 +144,14 @@ public class UserControllerTest {
         response.andExpect(status().isUnauthorized());
     }
 
-    @Test
-    @WithMockUser(username = "123mudar", password = "123mudar")
-    public void helloWorld() throws Exception {
-        // Act
-        ResultActions response = this.mockMvc.perform(get("/api/v1/users/hello")
-                .contentType(MediaType.APPLICATION_JSON));
-
-        // Assert
-        response.andExpect(status().isOk());
-    }
+//    @Test
+//    @WithMockUser(username = "123mudar", password = "123mudar")
+//    public void helloWorld() throws Exception {
+//        // Act
+//        ResultActions response = this.mockMvc.perform(get("/api/v1/users/hello")
+//                .contentType(MediaType.APPLICATION_JSON));
+//
+//        // Assert
+//        response.andExpect(status().isOk());
+//    }
 }

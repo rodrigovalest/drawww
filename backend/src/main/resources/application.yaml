@@ -15,6 +15,10 @@ spring:
     jwt:
       secret-key: ${JWT_SECRET_KEY}
 
+  redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
+
   jpa:
     hibernate:
       ddl-auto: update
