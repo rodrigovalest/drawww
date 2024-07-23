@@ -3,6 +3,7 @@ package com.rodrigo.drawing_contest.controllers;
 import com.rodrigo.drawing_contest.dtos.mappers.RoomMapper;
 import com.rodrigo.drawing_contest.dtos.request.CreatePrivateRoomDto;
 import com.rodrigo.drawing_contest.dtos.request.EnterInPrivateRoomRequestDto;
+import com.rodrigo.drawing_contest.dtos.response.RoomResponseDto;
 import com.rodrigo.drawing_contest.models.room.Room;
 import com.rodrigo.drawing_contest.models.user.User;
 import com.rodrigo.drawing_contest.services.RoomService;
@@ -38,7 +39,7 @@ public class RoomController {
         return ResponseEntity.created(location).build();
     }
 
-    @PostMapping("/private/enter/{room_id}")
+    @PutMapping("/private/enter/{room_id}")
     public ResponseEntity<Void> enterInPrivateRoom(
             @PathVariable("room_id") UUID roomId,
             @RequestBody @Valid EnterInPrivateRoomRequestDto dto
@@ -53,8 +54,18 @@ public class RoomController {
     }
 
     @GetMapping("/{room_id}")
-    public ResponseEntity<?> findRoomById(@PathVariable("room_id") UUID roomId) {
+    public ResponseEntity<RoomResponseDto> findRoomById(@PathVariable("room_id") UUID roomId) {
         Room room = this.roomService.findRoomById(roomId);
         return ResponseEntity.ok(RoomMapper.toDto(room));
+    }
+
+    @PutMapping("/leave")
+    public ResponseEntity<Void> leaveRoom() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        User authenticatedUser = ((com.rodrigo.drawing_contest.models.user.UserDetails) userDetails).getUser();
+        this.roomService.leaveRoom(authenticatedUser);
+
+        return ResponseEntity.noContent().build();
     }
 }
