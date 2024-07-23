@@ -10,6 +10,7 @@ import com.rodrigo.drawing_contest.repositories.RoomRepository;
 import com.rodrigo.drawing_contest.repositories.UserRoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -21,6 +22,7 @@ public class RoomService {
     private final RoomRepository roomRepository;
     private final UserRoomRepository userRoomRepository;
 
+    @Transactional
     public Room createPublicRoom(User user) {
         if (this.userRoomRepository.getRoomIdOfUser(user.getId()) != null)
             throw new UserIsAlreadyInARoomException("cannot create a new room because user {" + user.getId() + "} is already in a room");
@@ -33,6 +35,7 @@ public class RoomService {
         return savedRoom;
     }
 
+    @Transactional
     public Room createPrivateRoom(User user, String password) {
         if (this.userRoomRepository.getRoomIdOfUser(user.getId()) != null)
             throw new UserIsAlreadyInARoomException("cannot create a new room because user {" + user.getId() + "} is already in a room");
@@ -45,6 +48,7 @@ public class RoomService {
         return savedRoom;
     }
 
+    @Transactional
     public void enterInPrivateRoom(User user, UUID roomId, String roomPassword) {
         if (this.userRoomRepository.getRoomIdOfUser(user.getId()) != null)
             throw new UserIsAlreadyInARoomException("cannot create a new room because user {" + user.getId() + "} is already in a room");
@@ -64,8 +68,10 @@ public class RoomService {
         this.userRoomRepository.addUserToRoom(user.getId(), room.getId());
     }
 
+    @Transactional
     public void enterInPublicRoom(User user, UUID roomId) {}
 
+    @Transactional
     public void leaveRoom(User user) {
         UUID roomId = this.userRoomRepository.getRoomIdOfUser(user.getId());
         if (roomId == null)
@@ -80,6 +86,7 @@ public class RoomService {
         this.userRoomRepository.removeUserFromRoom(user.getId());
     }
 
+    @Transactional
     public void deleteRoom(UUID roomId) {
         Room room = this.roomRepository.findRoom(roomId);
         if (room == null)
@@ -91,6 +98,7 @@ public class RoomService {
         this.roomRepository.deleteRoom(roomId);
     }
 
+    @Transactional(readOnly = true)
     public Room findRoomById(UUID roomId) {
         Room room = this.roomRepository.findRoom(roomId);
         if (room == null) throw new EntityNotFoundException("room with id {" + roomId + "} not found");

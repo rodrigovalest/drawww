@@ -1,5 +1,6 @@
 package com.rodrigo.drawing_contest.controllers;
 
+import com.rodrigo.drawing_contest.dtos.mappers.RoomMapper;
 import com.rodrigo.drawing_contest.dtos.request.CreatePrivateRoomDto;
 import com.rodrigo.drawing_contest.dtos.request.EnterInPrivateRoomRequestDto;
 import com.rodrigo.drawing_contest.models.room.Room;
@@ -23,7 +24,6 @@ import java.util.UUID;
 @RequestMapping("/api/v1/rooms")
 public class RoomController {
 
-    private final UserService userService;
     private final RoomService roomService;
 
     @PostMapping("/private")
@@ -50,5 +50,11 @@ public class RoomController {
         this.roomService.enterInPrivateRoom(authenticatedUser, roomId, dto.getPassword());
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{room_id}")
+    public ResponseEntity<?> findRoomById(@PathVariable("room_id") UUID roomId) {
+        Room room = this.roomService.findRoomById(roomId);
+        return ResponseEntity.ok(RoomMapper.toDto(room));
     }
 }
