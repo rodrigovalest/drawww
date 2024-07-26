@@ -8,7 +8,7 @@ import { IUser } from '../../interfaces/user.interface';
 import { LinkComponent } from "../../components/link/link.component";
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-signup',
   standalone: true,
   imports: [
     TitleComponent,
@@ -16,29 +16,29 @@ import { LinkComponent } from "../../components/link/link.component";
     ButtonComponent,
     LinkComponent
 ],
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  templateUrl: './signup.component.html',
+  styleUrl: './signup.component.css'
 })
-export class LoginComponent {
-  loginForm: FormGroup<{ 
+export class SignupComponent {
+  signUpForm: FormGroup<{ 
     username: FormControl<string>; 
     password: FormControl<string>; 
   }>;
 
   constructor(private authService: AuthService) {
-    this.loginForm = new FormGroup({
+    this.signUpForm = new FormGroup({
       username: new FormControl<string>('', { nonNullable: true, validators: [Validators.required] }),
       password: new FormControl<string>('', { nonNullable: true, validators: [Validators.required] }),
     });
   }
 
   onLoginButtonClicked(): void {
-    if (!this.loginForm.valid) {
+    if (!this.signUpForm.valid) {
       console.error('Invalid form');
       return;
     }
 
-    const user: IUser = this.loginForm.getRawValue();
-    this.authService.doLogin(user);
+    const user: IUser = this.signUpForm.getRawValue();
+    this.authService.doSignUp(user);
   }
 }

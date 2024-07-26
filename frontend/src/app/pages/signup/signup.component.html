@@ -1,0 +1,9 @@
+<div class="bg-baseWhite w-full h-screen flex items-center justify-center">
+    <div>
+        <app-title title="SIGN UP" class="mb-3" />
+        <app-input text="Username" [control]="signUpForm.controls.username" />
+        <app-input text="Password" [control]="signUpForm.controls.password" />
+        <app-link  text="Already have an account?" path="/login" class="mb-1" />
+        <app-button text="Sign up" (buttonClicked)="onLoginButtonClicked()" />
+    </div>
+</div>
