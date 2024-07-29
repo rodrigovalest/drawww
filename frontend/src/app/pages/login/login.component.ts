@@ -6,6 +6,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { IUser } from '../../interfaces/user.interface';
 import { LinkComponent } from "../../components/link/link.component";
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -25,11 +26,16 @@ export class LoginComponent {
     password: FormControl<string>; 
   }>;
 
-  constructor(private authService: AuthService) {
+  constructor(private authService: AuthService, private router: Router) {
     this.loginForm = new FormGroup({
       username: new FormControl<string>('', { nonNullable: true, validators: [Validators.required] }),
       password: new FormControl<string>('', { nonNullable: true, validators: [Validators.required] }),
     });
+  }
+
+  ngOnInit() {
+    if (this.authService.isLoggedIn())
+      this.router.navigate(['']);
   }
 
   onLoginButtonClicked(): void {
@@ -39,6 +45,12 @@ export class LoginComponent {
     }
 
     const user: IUser = this.loginForm.getRawValue();
-    this.authService.doLogin(user);
+    this.authService.doLogin(user).subscribe({
+      next: (data) => {
+        this.authService.setToken(data.token);
+        this.router.navigate(['']);
+      },
+      error: (error) => console.log(error)
+    });
   }
 }
