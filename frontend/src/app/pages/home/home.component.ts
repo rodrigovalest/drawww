@@ -8,7 +8,6 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [ButtonComponent],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.css'
 })
 export class HomeComponent {
   constructor (private authService: AuthService, private router: Router) {}

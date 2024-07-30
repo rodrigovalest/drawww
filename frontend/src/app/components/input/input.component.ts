@@ -6,7 +6,6 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
   standalone: true,
   imports: [ReactiveFormsModule],
   templateUrl: './input.component.html',
-  styleUrl: './input.component.css'
 })
 export class InputComponent {
   @Input() class: string = '';

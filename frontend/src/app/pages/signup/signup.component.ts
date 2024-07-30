@@ -18,7 +18,6 @@ import { Router } from '@angular/router';
     LinkComponent
 ],
   templateUrl: './signup.component.html',
-  styleUrl: './signup.component.css'
 })
 export class SignupComponent {
   signUpForm: FormGroup<{ 
@@ -38,13 +37,16 @@ export class SignupComponent {
       this.router.navigate(['']);
   }
 
-  onLoginButtonClicked(): void {
+  onSignupButtonClicked(): void {
     if (!this.signUpForm.valid) {
       console.error('Invalid form');
       return;
     }
 
     const user: IUser = this.signUpForm.getRawValue();
-    this.authService.doSignUp(user);
+    this.authService.doSignUp(user).subscribe({
+      next: () => this.router.navigate(['login']),
+      error: (error) => console.log('ERROR trying to do sign up')
+    });
   }
 }

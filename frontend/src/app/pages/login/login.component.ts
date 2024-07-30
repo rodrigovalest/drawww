@@ -7,6 +7,7 @@ import { AuthService } from '../../services/auth.service';
 import { IUser } from '../../interfaces/user.interface';
 import { LinkComponent } from "../../components/link/link.component";
 import { Router } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-login',
@@ -18,7 +19,6 @@ import { Router } from '@angular/router';
     LinkComponent
 ],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
   loginForm: FormGroup<{ 
@@ -47,10 +47,16 @@ export class LoginComponent {
     const user: IUser = this.loginForm.getRawValue();
     this.authService.doLogin(user).subscribe({
       next: (data) => {
+        console.log(data)
         this.authService.setToken(data.token);
         this.router.navigate(['']);
       },
-      error: (error) => console.log(error)
+      error: (httpError: HttpErrorResponse) => {
+        console.log(httpError)
+
+        if (httpError.status == 401)
+          console.log(httpError.error.message)
+      }
     });
   }
 }
