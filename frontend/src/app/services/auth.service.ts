@@ -3,6 +3,7 @@ import { IUser } from '../interfaces/user.interface';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../environments/environment';
+import { ILoginResponse } from '../interfaces/login-response.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -12,12 +13,12 @@ export class AuthService {
 
   constructor(private httpClient: HttpClient) {}
 
-  doLogin(user: IUser): Observable<{token: string}> {
-    return this.httpClient.post<{token: string}>(`${this.apiUrl}/api/v1/users/login`, user);
+  doLogin(user: IUser): Observable<ILoginResponse> {
+    return this.httpClient.post<ILoginResponse>(`${this.apiUrl}/api/v1/users/login`, user);
   }
   
-  doSignUp(user: IUser): Observable<IUser> {
-    return this.httpClient.post<IUser>(`${this.apiUrl}/api/v1/users/register`, user);
+  doSignUp(user: IUser): Observable<null> {
+    return this.httpClient.post<null>(`${this.apiUrl}/api/v1/users/register`, user);
   }
 
   setToken(token: string): void {
