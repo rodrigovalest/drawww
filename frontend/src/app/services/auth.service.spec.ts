@@ -7,7 +7,7 @@ import { HttpErrorResponse, provideHttpClient } from '@angular/common/http';
 import { environment } from '../environments/environment';
 import { ILoginResponse } from '../interfaces/login-response.interface';
 
-fdescribe('AuthService', () => {
+describe('AuthService', () => {
   let apiUrl = environment.apiUrl
   let authService: AuthService;
   let httpMock: HttpTestingController;
