@@ -28,8 +28,8 @@ describe('TitleComponent', () => {
 
     await fixture.whenStable();
 
-    const button: HTMLElement = fixture.nativeElement.querySelector('h2');
-    expect(button.textContent).toContain(mockedInputTitle);
+    const p: HTMLElement = fixture.nativeElement.querySelector('h2');
+    expect(p.textContent).toContain(mockedInputTitle);
   });
 
   it('should bind the attribute "class" in outer div class on template', async () => {

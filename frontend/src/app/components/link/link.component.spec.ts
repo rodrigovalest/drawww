@@ -46,8 +46,8 @@ describe('LinkComponent', () => {
 
     await fixture.whenStable();
 
-    const button: HTMLElement = fixture.nativeElement.querySelector('a');
-    expect(button.textContent).toContain(mockedInputText);
+    const a: HTMLElement = fixture.nativeElement.querySelector('a');
+    expect(a.textContent).toContain(mockedInputText);
   });
 
   it('should bind "path" to routerLink', async () => {

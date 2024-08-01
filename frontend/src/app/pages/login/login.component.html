@@ -2,7 +2,7 @@
     <div>
         <app-title title="LOGIN" class="mb-3" />
         <app-input text="Username" [control]="loginForm.controls.username" />
-        <app-input text="Password" [control]="loginForm.controls.password" />
+        <app-input text="Password" [control]="loginForm.controls.password" type="password" />
         <app-link  text="Not have an account yet?" path="/signup" class="mb-1" />
         <app-button text="Login" (buttonClicked)="onLoginButtonClicked()" />
     </div>
