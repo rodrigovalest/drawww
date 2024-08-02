@@ -6,9 +6,10 @@ import { provideRouter, Router } from '@angular/router';
 import { HomeComponent } from '../home/home.component';
 import { LoginComponent } from '../login/login.component';
 import { By } from '@angular/platform-browser';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 
-describe('SignupComponent', () => {
+fdescribe('SignupComponent', () => {
   let component: SignupComponent;
   let fixture: ComponentFixture<SignupComponent>;
   let authService: jasmine.SpyObj<AuthService>;
@@ -37,21 +38,47 @@ describe('SignupComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should do sign up logic and navigate to login', () => {
-    const mockedUsername = 'mockedUsername';
-    const mockedPassword = 'mockedPassword';
-    component.signUpForm.controls.username.setValue(mockedUsername);
-    component.signUpForm.controls.password.setValue(mockedPassword);
-    const button: HTMLElement = fixture.nativeElement.querySelector('button');
-    
-    authService.doSignUp.and.returnValue(of(null));
-    spyOn(router, 'navigate').and.callThrough();
+  describe('sign up logic', () => {
+    it('should successfully do sign up logic and navigate to login', () => {
+      const mockedUsername = 'mockedUsername';
+      const mockedPassword = 'mockedPassword';
+      component.signUpForm.controls.username.setValue(mockedUsername);
+      component.signUpForm.controls.password.setValue(mockedPassword);
+      const button: HTMLElement = fixture.nativeElement.querySelector('button');
+      
+      authService.doSignUp.and.returnValue(of(null));
+      spyOn(router, 'navigate').and.callThrough();
+  
+      fixture.detectChanges();
+      button.click();
+  
+      expect(authService.doSignUp).toHaveBeenCalledTimes(1);
+      expect(authService.doSignUp).toHaveBeenCalledWith({ 'username': mockedUsername, 'password': mockedPassword });
+      expect(router.navigate).toHaveBeenCalledWith(['login']);
+    });
 
-    fixture.detectChanges();
-    button.click();
+    it('should do sign up logic and authService returns a HttpErrorResponse with 409 HTTP status code', () => {
+      const mockedUsername = 'mockedUsername';
+      const mockedPassword = 'mockedPassword';
+      component.signUpForm.controls.username.setValue(mockedUsername);
+      component.signUpForm.controls.password.setValue(mockedPassword);
+      const button: HTMLElement = fixture.nativeElement.querySelector('button');
+      
+      authService.doSignUp.and.returnValue(throwError(() => new HttpErrorResponse({
+        error: { message: `username ${mockedUsername} is invalid` },
+        status: 409,
+        statusText: 'Conflict'
+      })));
 
-    expect(authService.doSignUp).toHaveBeenCalledTimes(1);
-    expect(router.navigate).toHaveBeenCalledWith(['login']);
+      spyOn(router, 'navigate').and.callThrough();
+  
+      fixture.detectChanges();
+      button.click();
+  
+      expect(authService.doSignUp).toHaveBeenCalledTimes(1);
+      expect(authService.doSignUp).toHaveBeenCalledWith({ 'username': mockedUsername, 'password': mockedPassword });
+      expect(router.navigate).toHaveBeenCalledTimes(0);
+    });
   });
 
   it('should navigate to home if user is already logged in', () => {
