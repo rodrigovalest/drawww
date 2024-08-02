@@ -39,24 +39,16 @@ export class LoginComponent {
   }
 
   onLoginButtonClicked(): void {
-    if (!this.loginForm.valid) {
-      console.error('Invalid form');
+    if (!this.loginForm.valid) 
       return;
-    }
 
     const user: IUser = this.loginForm.getRawValue();
     this.authService.doLogin(user).subscribe({
       next: (data) => {
-        console.log(data)
         this.authService.setToken(data.token);
         this.router.navigate(['']);
       },
-      error: (httpError: HttpErrorResponse) => {
-        console.log(httpError)
-
-        if (httpError.status == 401)
-          console.log(httpError.error.message)
-      }
+      error: (httpError: HttpErrorResponse) => console.log(httpError)
     });
   }
 }
