@@ -1,9 +1,27 @@
 <div class="bg-baseWhite w-full h-screen flex items-center justify-center">
     <div>
         <app-title title="LOGIN" class="mb-3" />
+
         <app-input text="Username" [control]="loginForm.controls.username" />
-        <app-input text="Password" [control]="loginForm.controls.password" />
+        @if (loginForm.controls.username.invalid && (loginForm.controls.username.dirty || loginForm.controls.username.touched)) {
+            @if (loginForm.controls.username.errors?.['minlength'] || loginForm.controls.username.errors?.['required']) {
+                <p class="bg-red-500" id="username-error">
+                    Username must be at least 1 character long.
+                </p>
+            }
+        }
+
+        <app-input text="Password" [control]="loginForm.controls.password" type="password" />
+        @if (loginForm.controls.password.invalid && (loginForm.controls.password.dirty || loginForm.controls.password.touched)) {
+            @if (loginForm.controls.password.errors?.['minlength'] || loginForm.controls.password.errors?.['required']) {
+                <p class="font-apercu bg-red-700 text-red-500" id="password-error">
+                    Password must be at least 1 character long.
+                </p>
+            }
+        }
+
         <app-link  text="Not have an account yet?" path="/signup" class="mb-1" />
+        
         <app-button text="Login" (buttonClicked)="onLoginButtonClicked()" />
     </div>
 </div>

@@ -7,6 +7,7 @@ import { AuthService } from '../../services/auth.service';
 import { IUser } from '../../interfaces/user.interface';
 import { LinkComponent } from "../../components/link/link.component";
 import { Router } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-login',
@@ -18,7 +19,6 @@ import { Router } from '@angular/router';
     LinkComponent
 ],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
   loginForm: FormGroup<{ 
@@ -39,10 +39,8 @@ export class LoginComponent {
   }
 
   onLoginButtonClicked(): void {
-    if (!this.loginForm.valid) {
-      console.error('Invalid form');
+    if (!this.loginForm.valid) 
       return;
-    }
 
     const user: IUser = this.loginForm.getRawValue();
     this.authService.doLogin(user).subscribe({
@@ -50,7 +48,7 @@ export class LoginComponent {
         this.authService.setToken(data.token);
         this.router.navigate(['']);
       },
-      error: (error) => console.log(error)
+      error: (httpError: HttpErrorResponse) => console.log(httpError)
     });
   }
 }

@@ -6,7 +6,6 @@ import { RouterModule } from '@angular/router';
   standalone: true,
   imports: [RouterModule],
   templateUrl: './link.component.html',
-  styleUrl: './link.component.css'
 })
 export class LinkComponent {
   @Input() class: string = '';

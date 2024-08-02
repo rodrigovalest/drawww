@@ -5,7 +5,6 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   standalone: true,
   imports: [],
   templateUrl: './button.component.html',
-  styleUrl: './button.component.css'
 })
 export class ButtonComponent {
   @Input() class: string = '';

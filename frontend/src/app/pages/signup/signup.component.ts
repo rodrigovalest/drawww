@@ -7,6 +7,7 @@ import { AuthService } from '../../services/auth.service';
 import { IUser } from '../../interfaces/user.interface';
 import { LinkComponent } from "../../components/link/link.component";
 import { Router } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-signup',
@@ -18,7 +19,6 @@ import { Router } from '@angular/router';
     LinkComponent
 ],
   templateUrl: './signup.component.html',
-  styleUrl: './signup.component.css'
 })
 export class SignupComponent {
   signUpForm: FormGroup<{ 
@@ -28,8 +28,8 @@ export class SignupComponent {
 
   constructor(private authService: AuthService, private router: Router) {
     this.signUpForm = new FormGroup({
-      username: new FormControl<string>('', { nonNullable: true, validators: [Validators.required] }),
-      password: new FormControl<string>('', { nonNullable: true, validators: [Validators.required] }),
+      username: new FormControl<string>('', { nonNullable: true, validators: [Validators.required, Validators.minLength(1)] }),
+      password: new FormControl<string>('', { nonNullable: true, validators: [Validators.required, Validators.minLength(1)] }),
     });
   }
 
@@ -38,13 +38,19 @@ export class SignupComponent {
       this.router.navigate(['']);
   }
 
-  onLoginButtonClicked(): void {
-    if (!this.signUpForm.valid) {
-      console.error('Invalid form');
+  onSignupButtonClicked(): void {
+    if (!this.signUpForm.valid)
       return;
-    }
 
     const user: IUser = this.signUpForm.getRawValue();
-    this.authService.doSignUp(user);
+    this.authService.doSignUp(user).subscribe({
+      next: () => this.router.navigate(['login']),
+      error: (error: HttpErrorResponse) => {
+        if (error.status === 409)
+          console.error(error)
+        else if (error.status === 500)
+          console.error("something went wrong")
+      }
+    });
   }
 }
