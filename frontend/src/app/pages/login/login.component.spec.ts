@@ -7,8 +7,9 @@ import { HomeComponent } from '../home/home.component';
 import { of, throwError } from 'rxjs';
 import { ILoginResponse } from '../../interfaces/login-response.interface';
 import { HttpErrorResponse } from '@angular/common/http';
+import { By } from '@angular/platform-browser';
 
-fdescribe('LoginComponent', () => {
+describe('LoginComponent', () => {
   let component: LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
   let authService: jasmine.SpyObj<AuthService>;
@@ -136,7 +137,7 @@ fdescribe('LoginComponent', () => {
       expect(passwordError.textContent).toContain('Password must be at least 1 character long.');
     });
 
-    it('should not permit do sign up if input data is not valid', () => {
+    it('should not permit do login if input data is not valid', () => {
       component.loginForm.controls.username.setValue('');
       component.loginForm.controls.password.setValue('');
       component.loginForm.controls.username.markAsTouched();
@@ -148,7 +149,7 @@ fdescribe('LoginComponent', () => {
       const button: HTMLElement = fixture.nativeElement.querySelector('button');
       button.click();
 
-      expect(authService.doSignUp).toHaveBeenCalledTimes(0);
+      expect(authService.doLogin).toHaveBeenCalledTimes(0);
     });
   });
 });
