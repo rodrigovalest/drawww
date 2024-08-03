@@ -1,2 +1,12 @@
-<h1>HOME</h1>
-<app-button text="logout" (buttonClicked)="onLogout()" />
+<div class="bg-baseWhite w-full h-screen flex items-center justify-center">
+    <div class="absolute top-0 left-0 p-3">
+        <app-logout />
+    </div>
+    <div>
+        <app-title title="DRAWING CONTEST" class="mb-4" />
+
+        <app-button text="Play in public room" class="mb-2" (buttonClicked)="onPlayInPubicRoom()" />
+        <app-button text="Play in private room" class="mb-2" (buttonClicked)="onPlayInPrivateRoom()" />
+        <app-button text="History" />
+    </div>
+</div>
