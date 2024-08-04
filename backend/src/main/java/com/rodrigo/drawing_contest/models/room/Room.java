@@ -4,6 +4,7 @@ import com.rodrigo.drawing_contest.models.user.UserRedis;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.redis.core.RedisHash;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@RedisHash("room")
 public class Room {
     private UUID id;
     private String password;

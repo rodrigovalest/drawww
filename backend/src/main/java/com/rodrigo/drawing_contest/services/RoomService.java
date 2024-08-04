@@ -22,6 +22,13 @@ public class RoomService {
     private final RoomRepository roomRepository;
     private final UserRoomRepository userRoomRepository;
 
+    @Transactional(readOnly = true)
+    public Room findRoomById(UUID id) {
+        return this.roomRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("room with id {" + id + "} not found")
+        );
+    }
+
     @Transactional
     public Room createPublicRoom(User user) {
         if (this.userRoomRepository.getRoomIdOfUser(user.getId()) != null)
@@ -29,7 +36,7 @@ public class RoomService {
 
         Room room = new Room(null, null, RoomAccessTypeEnum.PUBLIC, RoomStatusEnum.WAITING, 10L);
         room.addUser(new UserRedis(user.getId(), user.getUsername()));
-        Room savedRoom = this.roomRepository.saveRoom(room);
+        Room savedRoom = this.roomRepository.save(room);
         this.userRoomRepository.addUserToRoom(user.getId(), savedRoom.getId());
 
         return savedRoom;
@@ -42,7 +49,7 @@ public class RoomService {
 
         Room room = new Room(null, password, RoomAccessTypeEnum.PRIVATE, RoomStatusEnum.WAITING, 10L);
         room.addUser(new UserRedis(user.getId(), user.getUsername()));
-        Room savedRoom = this.roomRepository.saveRoom(room);
+        Room savedRoom = this.roomRepository.save(room);
         this.userRoomRepository.addUserToRoom(user.getId(), savedRoom.getId());
 
         return savedRoom;
@@ -53,8 +60,8 @@ public class RoomService {
         if (this.userRoomRepository.getRoomIdOfUser(user.getId()) != null)
             throw new UserIsAlreadyInARoomException("cannot create a new room because user {" + user.getId() + "} is already in a room");
 
-        Room room = this.roomRepository.findRoom(roomId);
-        if (room == null || room.getAccessType() != RoomAccessTypeEnum.PRIVATE)
+        Room room = this.findRoomById(roomId);
+        if (room.getAccessType() != RoomAccessTypeEnum.PRIVATE)
             throw new EntityNotFoundException("room with id {" + roomId + "} not found");
 
         if (!Objects.equals(room.getPassword(), roomPassword))
@@ -64,7 +71,7 @@ public class RoomService {
             throw new RoomNotAvailable("cannot enter in room {" + roomId + "} because match already started");
 
         room.addUser(new UserRedis(user.getId(), user.getUsername()));
-        this.roomRepository.saveRoom(room);
+        this.roomRepository.save(room);
         this.userRoomRepository.addUserToRoom(user.getId(), room.getId());
     }
 
@@ -77,31 +84,20 @@ public class RoomService {
         if (roomId == null)
             throw new UserIsNotInAnyRoomException("cannot leave room because user {" + user.getId() + "} is not in any room");
 
-        Room room = this.roomRepository.findRoom(roomId);
-        if (room == null)
-            throw new EntityNotFoundException("room with id {" + roomId + "} not found");
+        Room room = this.findRoomById(roomId);
 
         room.removeUser(user.getId());
-        this.roomRepository.saveRoom(room);
+        this.roomRepository.save(room);
         this.userRoomRepository.removeUserFromRoom(user.getId());
     }
 
     @Transactional
     public void deleteRoom(UUID roomId) {
-        Room room = this.roomRepository.findRoom(roomId);
-        if (room == null)
-            throw new EntityNotFoundException("room with id {" + roomId + "} not found");
+        Room room = this.findRoomById(roomId);
 
         for (UserRedis user : room.getUsers())
             this.userRoomRepository.removeUserFromRoom(user.getId());
 
-        this.roomRepository.deleteRoom(roomId);
-    }
-
-    @Transactional(readOnly = true)
-    public Room findRoomById(UUID roomId) {
-        Room room = this.roomRepository.findRoom(roomId);
-        if (room == null) throw new EntityNotFoundException("room with id {" + roomId + "} not found");
-        return room;
+        this.roomRepository.deleteById(roomId);
     }
 }
