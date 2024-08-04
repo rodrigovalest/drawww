@@ -1,8 +1,6 @@
 package com.rodrigo.drawing_contest.repositories;
 
 import com.rodrigo.drawing_contest.config.TestRedisConfig;
-import com.rodrigo.drawing_contest.exceptions.UserIsAlreadyInARoomException;
-import com.rodrigo.drawing_contest.exceptions.UserIsNotInAnyRoomException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -21,18 +19,18 @@ import org.testcontainers.utility.DockerImageName;
 
 import java.util.UUID;
 
-import static com.rodrigo.drawing_contest.repositories.UserRoomRepository.USER_ROOM_KEY_PREFIX;
+import static com.rodrigo.drawing_contest.repositories.UserRoomRepositoryImpl.USER_ROOM_KEY_PREFIX;
 
 @DataRedisTest
 @Testcontainers
-@Import({ TestRedisConfig.class, UserRoomRepository.class })
-public class UserRoomRepositoryTest {
+@Import({ TestRedisConfig.class, UserRoomRepositoryImpl.class })
+public class UserRoomRepositoryImplTest {
 
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
     @Autowired
-    private UserRoomRepository userRoomRepository;
+    private UserRoomRepositoryImpl userRoomRepository;
 
     @Container
     private final static GenericContainer<?> redisContainer = new GenericContainer<>(DockerImageName.parse("redis:7.2"))
