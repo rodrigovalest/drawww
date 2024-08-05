@@ -28,6 +28,17 @@ public class RestExceptionHandler {
                 .body(restErrorMessage);
     }
 
+    @ExceptionHandler(InvalidJwtTokenException.class)
+    private ResponseEntity<RestErrorMessage> invalidJwtTokenExceptionHandler(
+            InvalidJwtTokenException e
+    ) {
+        RestErrorMessage restErrorMessage = new RestErrorMessage(HttpStatus.UNAUTHORIZED, e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(restErrorMessage);
+    }
+
     @ExceptionHandler(RuntimeException.class)
     private ResponseEntity<RestErrorMessage> runtimeExceptionHandler(
             RuntimeException e

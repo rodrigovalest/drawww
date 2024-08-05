@@ -35,13 +35,10 @@ public class SecurityFilter extends OncePerRequestFilter {
         if (token != null) {
             String username = this.jwtService.getUsernameByToken(token);
             User user = this.userService.findUserByUsername(username);
+            UserDetails userDetails = new UserDetails(user);
 
-            if (user != null) {
-                UserDetails userDetails = new UserDetails(user);
-
-                var authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
+            var authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
         filterChain.doFilter(request, response);
