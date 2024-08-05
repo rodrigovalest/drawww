@@ -1,0 +1,19 @@
+<div class="bg-baseWhite w-full h-screen flex items-center justify-center">
+    <div>
+        <app-title title="Waiting..." class="mb-4" />
+
+        <p class="mb-2 font-apercu font-normal text-lg">
+            Room ID: {{ roomId }}
+        </p>
+
+        <div class="flex mb-4 max-w-[400px]">
+            <app-user-icon class="mr-2" />
+            <app-user-icon class="mr-2" />
+            <app-user-icon class="mr-2" />
+            <app-user-icon class="mr-2" />
+            <app-user-icon class="mr-2" />
+        </div>
+        
+        <app-button text="Ready" (buttonClicked)="onReady()" />
+    </div>
+</div>
