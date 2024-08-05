@@ -5,18 +5,14 @@
         <app-input text="Username" [control]="signUpForm.controls.username" />
         @if (signUpForm.controls.username.invalid && (signUpForm.controls.username.dirty || signUpForm.controls.username.touched)) {
             @if (signUpForm.controls.username.errors?.['minlength'] || signUpForm.controls.username.errors?.['required']) {
-                <p class="bg-red-500" id="username-error">
-                    Username must be at least 1 character long.
-                </p>
+                <app-input-error text="Username must be at least 1 character long." />
             }
         }
         
         <app-input text="Password" [control]="signUpForm.controls.password" type="password" />
         @if (signUpForm.controls.password.invalid && (signUpForm.controls.password.dirty || signUpForm.controls.password.touched)) {
             @if (signUpForm.controls.password.errors?.['minlength'] || signUpForm.controls.password.errors?.['required']) {
-                <p class="font-apercu bg-red-700 text-red-500" id="password-error">
-                    Password must be at least 1 character long.
-                </p>
+                <app-input-error text="Password must be at least 1 character long." class="mb-3" />
             }
         }
 

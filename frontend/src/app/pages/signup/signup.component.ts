@@ -8,6 +8,7 @@ import { IUser } from '../../interfaces/user.interface';
 import { LinkComponent } from "../../components/link/link.component";
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { InputErrorComponent } from "../../components/input-error/input-error.component";
 
 @Component({
   selector: 'app-signup',
@@ -16,7 +17,8 @@ import { HttpErrorResponse } from '@angular/common/http';
     TitleComponent,
     InputComponent,
     ButtonComponent,
-    LinkComponent
+    LinkComponent,
+    InputErrorComponent
 ],
   templateUrl: './signup.component.html',
 })
