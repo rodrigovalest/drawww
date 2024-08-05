@@ -1,5 +1,6 @@
 package com.rodrigo.drawing_contest.config.security;
 
+import com.rodrigo.drawing_contest.models.user.User;
 import com.rodrigo.drawing_contest.models.user.UserDetails;
 import com.rodrigo.drawing_contest.services.JwtService;
 import com.rodrigo.drawing_contest.services.UserService;
@@ -28,21 +29,21 @@ public class SecurityFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
-        String token = this.recoverToken(request);
+        String authHeader = request.getHeader("Authorization");
+        String token = (authHeader != null) ? authHeader.replace("Bearer ", "") : null;
 
         if (token != null) {
             String username = this.jwtService.getUsernameByToken(token);
-            UserDetails userDetails = new UserDetails(this.userService.findUserByUsername(username));
+            User user = this.userService.findUserByUsername(username);
 
-            var authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            if (user != null) {
+                UserDetails userDetails = new UserDetails(user);
+
+                var authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
         }
 
         filterChain.doFilter(request, response);
-    }
-
-    private String recoverToken(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        return (authHeader != null) ? authHeader.replace("Bearer ", "") : null;
     }
 }
