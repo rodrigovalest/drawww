@@ -1,4 +1,4 @@
-package com.rodrigo.drawing_contest.config;
+package com.rodrigo.drawing_contest.config.websockets;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
