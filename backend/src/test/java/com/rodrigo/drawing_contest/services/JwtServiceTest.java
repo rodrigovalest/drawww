@@ -1,5 +1,6 @@
 package com.rodrigo.drawing_contest.services;
 
+import com.rodrigo.drawing_contest.exceptions.InvalidJwtTokenException;
 import com.rodrigo.drawing_contest.models.user.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -68,14 +69,8 @@ public class JwtServiceTest {
 
     @Test
     public void validateToken_WithInvalidToken_ReturnFalse() {
-        // Arrange
         String token = "asdmasdlasdksadkdalslsadlasdldasllsadldaslsdaldaslladsdsaasd.asdkdaskadsk.asdkasdkasdkads";
-
-        // Act
-        boolean sut = this.jwtService.validateToken(token);
-
-        // Assert
-        Assertions.assertThat(sut).isFalse();
+        Assertions.assertThatThrownBy(() -> this.jwtService.validateToken(token)).isInstanceOf(InvalidJwtTokenException.class);
     }
 
     @Test
@@ -96,26 +91,14 @@ public class JwtServiceTest {
 
     @Test
     public void getUsernameByToken_WithNullToken_ReturnsNull() {
-        // Arrange
         String token = null;
-
-        // Act
-        String sut = this.jwtService.getUsernameByToken(token);
-
-        // Assert
-        Assertions.assertThat(sut).isNull();
+        Assertions.assertThatThrownBy(() -> this.jwtService.getUsernameByToken(token)).isInstanceOf(InvalidJwtTokenException.class);
     }
 
     @Test
     public void getUsernameByToken_WithEmptyToken_ReturnsNull() {
-        // Arrange
         String token = "";
-
-        // Act
-        String sut = this.jwtService.getUsernameByToken(token);
-
-        // Assert
-        Assertions.assertThat(sut).isNull();
+        Assertions.assertThatThrownBy(() -> this.jwtService.getUsernameByToken(token)).isInstanceOf(InvalidJwtTokenException.class);
     }
 
     @Test

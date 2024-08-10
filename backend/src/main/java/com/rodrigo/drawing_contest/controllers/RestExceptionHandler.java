@@ -1,5 +1,7 @@
-package com.rodrigo.drawing_contest.exceptions;
+package com.rodrigo.drawing_contest.controllers;
 
+import com.rodrigo.drawing_contest.dtos.response.RestErrorMessage;
+import com.rodrigo.drawing_contest.exceptions.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,6 +24,17 @@ public class RestExceptionHandler {
         RestErrorMessage restErrorMessage = new RestErrorMessage(HttpStatus.UNPROCESSABLE_ENTITY, "invalid fields", bindingResult);
         return ResponseEntity
                 .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(restErrorMessage);
+    }
+
+    @ExceptionHandler(InvalidJwtTokenException.class)
+    private ResponseEntity<RestErrorMessage> invalidJwtTokenExceptionHandler(
+            InvalidJwtTokenException e
+    ) {
+        RestErrorMessage restErrorMessage = new RestErrorMessage(HttpStatus.UNAUTHORIZED, e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(restErrorMessage);
     }

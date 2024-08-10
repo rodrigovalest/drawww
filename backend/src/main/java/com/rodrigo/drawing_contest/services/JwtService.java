@@ -1,5 +1,6 @@
 package com.rodrigo.drawing_contest.services;
 
+import com.rodrigo.drawing_contest.exceptions.InvalidJwtTokenException;
 import com.rodrigo.drawing_contest.models.user.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -50,7 +51,7 @@ public class JwtService {
 
             return true;
         } catch (JwtException e) {
-            return false;
+            throw new InvalidJwtTokenException("invalid bearer token");
         }
     }
 
@@ -64,11 +65,11 @@ public class JwtService {
 
             return (claims != null) ? claims.getSubject() : null;
         } catch (RuntimeException e) {
-            return null;
+            throw new InvalidJwtTokenException("invalid bearer token");
         }
     }
 
-    private String refactorToken(String token) {
+    public String refactorToken(String token) {
         return token.startsWith(this.JWT_BEARER) ? token.substring(this.JWT_BEARER.length()) : token;
     }
 

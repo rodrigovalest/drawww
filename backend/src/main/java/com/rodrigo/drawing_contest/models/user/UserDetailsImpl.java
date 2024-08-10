@@ -9,13 +9,13 @@ import java.util.Collections;
 
 @RequiredArgsConstructor
 @Getter
-public class UserDetails implements org.springframework.security.core.userdetails.UserDetails {
+public class UserDetailsImpl implements org.springframework.security.core.userdetails.UserDetails {
 
     private final User user;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptyList();
+        return Collections.singleton((GrantedAuthority) () -> "USER");
     }
 
     @Override
