@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -23,18 +24,13 @@ import java.net.URI;
 @RequestMapping("/api/v1/users")
 public class UserController {
 
-    private final AuthenticationManager authenticationManager;
     private final UserService userService;
     private final JwtService jwtService;
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(@RequestBody @Valid LoginRequestDto dto) {
         User user = this.userService.findUserByUsernameAndPassword(dto.getUsername(), dto.getPassword());
-        var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
-        var auth = this.authenticationManager.authenticate(usernamePasswordAuthenticationToken);
-        var userDetails = (UserDetailsImpl) auth.getPrincipal();
-        String token = this.jwtService.createToken(userDetails.getUser());
-
+        String token = this.jwtService.createToken(user);
         return ResponseEntity.ok(new LoginResponseDto(token));
     }
 

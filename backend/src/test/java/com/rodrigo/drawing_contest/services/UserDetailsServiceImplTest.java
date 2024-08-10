@@ -15,13 +15,13 @@ import java.time.LocalDateTime;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class UserDetailsServiceImplementationTest {
+public class UserDetailsServiceImplTest {
 
     @Mock
     private UserService userService;
 
     @InjectMocks
-    private UserDetailsServiceImplementation userDetailsServiceImplementation;
+    private UserDetailsServiceImpl userDetailsServiceImpl;
 
     @Test
     public void loadUserByUsername_WithValidUsername_ReturnUserDetails() {
@@ -31,7 +31,7 @@ public class UserDetailsServiceImplementationTest {
         when(this.userService.findUserByUsername(username)).thenReturn(persistedUser);
 
         // Act
-        UserDetails sut = this.userDetailsServiceImplementation.loadUserByUsername(username);
+        UserDetails sut = this.userDetailsServiceImpl.loadUserByUsername(username);
 
         // Assert
         Assertions.assertThat(sut).isNotNull();
@@ -46,7 +46,7 @@ public class UserDetailsServiceImplementationTest {
         String username = "cleiton";
         when(this.userService.findUserByUsername(username)).thenThrow(EntityNotFoundException.class);
 
-        Assertions.assertThatThrownBy(() -> this.userDetailsServiceImplementation.loadUserByUsername(username))
+        Assertions.assertThatThrownBy(() -> this.userDetailsServiceImpl.loadUserByUsername(username))
                 .isInstanceOf(EntityNotFoundException.class);
 
         verify(this.userService, times(1)).findUserByUsername(username);
