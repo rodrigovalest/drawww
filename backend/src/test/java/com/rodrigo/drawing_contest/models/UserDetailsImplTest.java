@@ -1,7 +1,7 @@
-package com.rodrigo.drawing_contest.security;
+package com.rodrigo.drawing_contest.models;
 
 import com.rodrigo.drawing_contest.models.user.User;
-import com.rodrigo.drawing_contest.models.user.UserDetails;
+import com.rodrigo.drawing_contest.models.user.UserDetailsImpl;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,24 +11,26 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
+import java.util.Collections;
 
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class UserDetailsTest {
+public class UserDetailsImplTest {
 
     @Mock
     private User user;
 
     @InjectMocks
-    private UserDetails userDetails;
+    private UserDetailsImpl userDetailsImpl;
 
     @Test
-    public void getAuthorities_WithValidData_ShouldReturnEmptyList() {
-        Collection<? extends GrantedAuthority> sut = this.userDetails.getAuthorities();
+    public void getAuthorities_WithValidData_ShouldReturnUser() {
+        Collection<? extends GrantedAuthority> sut = this.userDetailsImpl.getAuthorities();
 
         Assertions.assertThat(sut).isNotNull();
-        Assertions.assertThat(sut).isEmpty();
+        Assertions.assertThat(sut).extracting(GrantedAuthority::getAuthority)
+                .containsExactly("USER");
     }
 
     @Test
@@ -37,7 +39,7 @@ public class UserDetailsTest {
         when(this.user.getPassword()).thenReturn("mockedPassword");
 
         // Act
-        String sut = this.userDetails.getPassword();
+        String sut = this.userDetailsImpl.getPassword();
 
         // Assert
         Assertions.assertThat(sut).isNotNull();
@@ -50,7 +52,7 @@ public class UserDetailsTest {
         when(this.user.getUsername()).thenReturn("mockedUsername");
 
         // Act
-        String sut = this.userDetails.getUsername();
+        String sut = this.userDetailsImpl.getUsername();
 
         // Assert
         Assertions.assertThat(sut).isNotNull();

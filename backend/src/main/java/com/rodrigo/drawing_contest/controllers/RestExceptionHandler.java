@@ -117,4 +117,15 @@ public class RestExceptionHandler {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(restErrorMessage);
     }
+
+    @ExceptionHandler(UserPasswordDoNotMatchException.class)
+    private ResponseEntity<RestErrorMessage> userPasswordDoNotMatchExceptionHandler(
+            UserPasswordDoNotMatchException e
+    ) {
+        RestErrorMessage restErrorMessage = new RestErrorMessage(HttpStatus.UNAUTHORIZED, e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(restErrorMessage);
+    }
 }

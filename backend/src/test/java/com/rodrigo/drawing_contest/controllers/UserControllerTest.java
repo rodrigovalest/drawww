@@ -2,8 +2,9 @@ package com.rodrigo.drawing_contest.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rodrigo.drawing_contest.config.security.SecurityConfig;
+import com.rodrigo.drawing_contest.exceptions.UserPasswordDoNotMatchException;
 import com.rodrigo.drawing_contest.models.user.User;
-import com.rodrigo.drawing_contest.models.user.UserDetails;
+import com.rodrigo.drawing_contest.models.user.UserDetailsImpl;
 import com.rodrigo.drawing_contest.services.JwtService;
 import com.rodrigo.drawing_contest.services.UserService;
 import com.rodrigo.drawing_contest.dtos.request.LoginRequestDto;
@@ -18,7 +19,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -42,9 +42,6 @@ public class UserControllerTest {
 
     @MockBean
     private UserService userService;
-
-    @MockBean
-    private AuthenticationManager authenticationManager;
 
     @MockBean
     private JwtService jwtService;
@@ -104,41 +101,36 @@ public class UserControllerTest {
     @Test
     public void login_WithValidData_Returns200OK() throws Exception {
         // Arrange
-        LoginRequestDto loginRequestDto = new LoginRequestDto("user123", "123mudar");
-        User user = new User(null, loginRequestDto.getUsername(), "encryptedPassword", LocalDateTime.now(), LocalDateTime.now());
-        UserDetails userDetails = new UserDetails(user);
-
-        var authenticationToken = new UsernamePasswordAuthenticationToken(loginRequestDto.getUsername(), loginRequestDto.getPassword());
-        var authentication = new UsernamePasswordAuthenticationToken(userDetails, null, Collections.emptyList());
-
-        when(this.authenticationManager.authenticate(authenticationToken)).thenReturn(authentication);
-        when(this.jwtService.createToken(user)).thenReturn("fake-jwt-token");
+        LoginRequestDto dto = new LoginRequestDto("user123", "123mudar");
+        User savedUser = new User(213213L, "user123", "encryptedPassword", LocalDateTime.now(), LocalDateTime.now());
+        when(this.userService.findUserByUsernameAndPassword(dto.getUsername(), dto.getPassword()))
+                .thenReturn(savedUser);
+        when(this.jwtService.createToken(savedUser)).thenReturn("fake-jwt-token");
 
         // Act
         ResultActions response = this.mockMvc.perform(post("/api/v1/users/login")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(loginRequestDto)));
+                .content(objectMapper.writeValueAsString(dto)));
 
         // Assert
         response.andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").value("fake-jwt-token"));
 
-        verify(this.authenticationManager, times(1)).authenticate(authenticationToken);
-        verify(this.jwtService, times(1)).createToken(user);
+        verify(this.userService, times(1)).findUserByUsernameAndPassword(dto.getUsername(), dto.getPassword());
+        verify(this.jwtService, times(1)).createToken(savedUser);
     }
 
     @Test
     public void login_WithInvalidData_Returns401Unauthorized() throws Exception {
         // Arrange
-        LoginRequestDto loginRequestDto = new LoginRequestDto("invalidUser", "wrongPassword");
-        var authenticationToken = new UsernamePasswordAuthenticationToken(loginRequestDto.getUsername(), loginRequestDto.getPassword());
-
-        when(this.authenticationManager.authenticate(authenticationToken)).thenThrow(BadCredentialsException.class);
+        LoginRequestDto dto = new LoginRequestDto("invalidUser", "wrongPassword");
+        when(this.userService.findUserByUsernameAndPassword(dto.getUsername(), dto.getPassword()))
+                .thenThrow(UserPasswordDoNotMatchException.class);
 
         // Act
         ResultActions response = this.mockMvc.perform(post("/api/v1/users/login")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(loginRequestDto)));
+                .content(objectMapper.writeValueAsString(dto)));
 
         // Assert
         response.andExpect(status().isUnauthorized());
