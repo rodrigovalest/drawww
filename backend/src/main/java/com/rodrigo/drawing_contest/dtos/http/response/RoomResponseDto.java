@@ -1,4 +1,4 @@
-package com.rodrigo.drawing_contest.dtos.response;
+package com.rodrigo.drawing_contest.dtos.http.response;
 
 import com.rodrigo.drawing_contest.models.room.RoomAccessTypeEnum;
 import com.rodrigo.drawing_contest.models.room.RoomStatusEnum;

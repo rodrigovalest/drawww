@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.redis.core.RedisHash;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -20,13 +21,24 @@ public class Room {
     private RoomAccessTypeEnum accessType;
     private RoomStatusEnum status;
     private Long size;
-    private final List<UserRedis> users = new ArrayList<UserRedis>();
+    private String theme;
+    private Instant startTime;
+    private Instant endTime;
+    private List<UserRedis> users = new ArrayList<UserRedis>();
+
+    public Room(UUID id, String password, RoomAccessTypeEnum accessType, RoomStatusEnum status, Long size) {
+        this.id = id;
+        this.password = password;
+        this.accessType = accessType;
+        this.status = status;
+        this.size = size;
+    }
 
     public void addUser(UserRedis user) {
         this.users.add(user);
     }
 
     public void removeUser(Long userId) {
-        this.users.removeIf(user -> user.getId().equals(userId));
+        this.users.removeIf(user -> user.getUserId().equals(userId));
     }
 }

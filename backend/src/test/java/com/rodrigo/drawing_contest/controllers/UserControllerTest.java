@@ -4,11 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rodrigo.drawing_contest.config.security.SecurityConfig;
 import com.rodrigo.drawing_contest.exceptions.UserPasswordDoNotMatchException;
 import com.rodrigo.drawing_contest.models.user.User;
-import com.rodrigo.drawing_contest.models.user.UserDetailsImpl;
 import com.rodrigo.drawing_contest.services.JwtService;
 import com.rodrigo.drawing_contest.services.UserService;
-import com.rodrigo.drawing_contest.dtos.request.LoginRequestDto;
-import com.rodrigo.drawing_contest.dtos.request.RegisterRequestDto;
+import com.rodrigo.drawing_contest.dtos.http.request.LoginRequestDto;
+import com.rodrigo.drawing_contest.dtos.http.request.RegisterRequestDto;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,14 +15,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;

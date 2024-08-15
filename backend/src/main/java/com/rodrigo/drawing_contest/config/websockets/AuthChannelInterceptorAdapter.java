@@ -1,4 +1,4 @@
-package com.rodrigo.drawing_contest.config;
+package com.rodrigo.drawing_contest.config.websockets;
 
 import com.rodrigo.drawing_contest.services.WebSocketAuthenticatorService;
 import lombok.RequiredArgsConstructor;
