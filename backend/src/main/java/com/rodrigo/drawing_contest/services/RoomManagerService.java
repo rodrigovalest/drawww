@@ -138,7 +138,6 @@ public class RoomManagerService {
 
         List<UserRedis> users = room.getUsers();
         for (UserRedis userRedis : users) {
-            System.out.println(userRedis.toString());
             if (userRedis.getSvg() == null) {
                 System.out.println("user {" + userRedis.getUsername() + "} removed by inactivity");
                 User user = this.userService.findUserByUsername(userRedis.getUsername());

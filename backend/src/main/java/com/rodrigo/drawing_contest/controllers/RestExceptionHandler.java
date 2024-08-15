@@ -85,39 +85,6 @@ public class RestExceptionHandler {
                 .body(restErrorDto);
     }
 
-    @ExceptionHandler(UserIsAlreadyInARoomException.class)
-    private ResponseEntity<RestErrorDto> userIsAlreadyInARoomExceptionHandler(
-            UserIsAlreadyInARoomException e
-    ) {
-        RestErrorDto restErrorDto = new RestErrorDto(HttpStatus.CONFLICT, e.getMessage());
-        return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(restErrorDto);
-    }
-
-    @ExceptionHandler(RoomPasswordDontMatchException.class)
-    private ResponseEntity<RestErrorDto> roomPasswordDontMatchExceptionHandler(
-            RoomPasswordDontMatchException e
-    ) {
-        RestErrorDto restErrorDto = new RestErrorDto(HttpStatus.UNAUTHORIZED, e.getMessage());
-        return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(restErrorDto);
-    }
-
-    @ExceptionHandler(RoomNotAvailable.class)
-    private ResponseEntity<RestErrorDto> roomNotAvailableHandler(
-            RoomNotAvailable e
-    ) {
-        RestErrorDto restErrorDto = new RestErrorDto(HttpStatus.SERVICE_UNAVAILABLE, e.getMessage());
-        return ResponseEntity
-                .status(HttpStatus.SERVICE_UNAVAILABLE)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(restErrorDto);
-    }
-
     @ExceptionHandler(UserPasswordDoNotMatchException.class)
     private ResponseEntity<RestErrorDto> userPasswordDoNotMatchExceptionHandler(
             UserPasswordDoNotMatchException e
