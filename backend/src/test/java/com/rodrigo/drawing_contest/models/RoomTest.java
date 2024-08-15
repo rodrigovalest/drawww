@@ -32,7 +32,7 @@ public class RoomTest {
         room.addUser(userRedis);
 
         // Act
-        room.removeUser(userRedis.getId());
+        room.removeUser(userRedis.getUserId());
 
         // Assert
         Assertions.assertThat(room.getUsers().contains(userRedis)).isFalse();
