@@ -1,5 +1,6 @@
 package com.rodrigo.drawing_contest.services;
 
+import com.rodrigo.drawing_contest.events.StartPlayingEvent;
 import com.rodrigo.drawing_contest.events.StartResultEvent;
 import com.rodrigo.drawing_contest.events.StartingVotingForNextDrawingEvent;
 import com.rodrigo.drawing_contest.events.UserInactivityEvent;
