@@ -12,15 +12,16 @@ import java.time.Instant;
 public class UserRedis {
     private Long userId;
     private String username;
-    private WaitingPlayerStatusEnum status;
+    private WaitingPlayerStatusEnum status = WaitingPlayerStatusEnum.WAITING;
     private String svg = null;
-    private Long voteCount;
-    private Double voteSum;
+    private Long voteCount = 0L;
+    private Double voteSum = 0.0;
+    private Double voteResult = 0.0;
+    private boolean votedInCurrentDraw = false;
 
     public UserRedis(Long userId, String username) {
         this.userId = userId;
         this.username = username;
-        this.status = WaitingPlayerStatusEnum.WAITING;
     }
 
     public enum WaitingPlayerStatusEnum {

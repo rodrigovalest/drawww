@@ -1,42 +1,53 @@
-//package com.rodrigo.drawing_contest.services;
-//
-//import com.rodrigo.drawing_contest.exceptions.*;
-//import com.rodrigo.drawing_contest.models.room.Room;
-//import com.rodrigo.drawing_contest.models.room.RoomAccessTypeEnum;
-//import com.rodrigo.drawing_contest.models.room.RoomStatusEnum;
-//import com.rodrigo.drawing_contest.models.user.User;
-//import com.rodrigo.drawing_contest.models.user.UserRedis;
-//import com.rodrigo.drawing_contest.repositories.RoomRepository;
-//import com.rodrigo.drawing_contest.repositories.UserRoomRepository;
-//import org.assertj.core.api.Assertions;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.mockito.Mock;
-//import org.mockito.junit.jupiter.MockitoExtension;
-//
-//import java.time.LocalDateTime;
-//import java.util.UUID;
-//
-//import static org.mockito.ArgumentMatchers.any;
-//import static org.mockito.ArgumentMatchers.anyLong;
-//import static org.mockito.ArgumentMatchers.eq;
-//import static org.mockito.Mockito.*;
-//
-//@ExtendWith(MockitoExtension.class)
-//public class RoomManagerServiceTest {
-//
-//    @Mock
-//    private RoomRepository roomRepository;
-//
-//    @Mock
-//    private UserRoomRepository userRoomRepository;
-//
-////    private final UserService userService;
-////    private final RoomPersistenceService roomPersistenceService;
-////    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-////    private final ApplicationEventPublisher eventPublisher;
-////    private static final int GAME_DURATION = 1;
-//
+package com.rodrigo.drawing_contest.services;
+
+import com.rodrigo.drawing_contest.exceptions.*;
+import com.rodrigo.drawing_contest.models.room.Room;
+import com.rodrigo.drawing_contest.models.room.RoomAccessTypeEnum;
+import com.rodrigo.drawing_contest.models.room.RoomStatusEnum;
+import com.rodrigo.drawing_contest.models.user.User;
+import com.rodrigo.drawing_contest.models.user.UserRedis;
+import com.rodrigo.drawing_contest.repositories.RoomRepository;
+import com.rodrigo.drawing_contest.repositories.UserRoomRepository;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+public class RoomManagerServiceTest {
+
+    @Mock
+    private RoomRepository roomRepository;
+
+    @Mock
+    private UserRoomRepository userRoomRepository;
+
+    @Mock
+    private RoomPersistenceService roomPersistenceService;
+
+    @InjectMocks
+    private RoomManagerService roomManagerService;
+
+//    private final UserService userService;
+//    private final RoomPersistenceService roomPersistenceService;
+//    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+//    private final ApplicationEventPublisher eventPublisher;
+//    private static final int GAME_DURATION = 1;
+
 //    @Test
 //    public void createPublicRoom_WithValidData_ShouldCreateRoom() {
 //        // Arrange
@@ -318,5 +329,57 @@
 //        verify(this.roomRepository, times(0)).save(any(Room.class));
 //        verify(this.userRoomRepository, times(0)).removeUserFromRoom(user.getId());
 //    }
-//
-//}
+
+    @Test
+    public void doVote_WithValidData_ShouldUpdateVotingUserAndUpdateTargetUserVotes() {
+        // Arrange
+        UUID roomId = UUID.randomUUID();
+        String votingUsername = "votingUsername";
+        String targetUsername = "targetUsername";
+        Long rate = 5L;
+
+        UserRedis userRedis1 = new UserRedis(7L, targetUsername);
+        userRedis1.setSvg("somesvg");
+        UserRedis userRedis2 = new UserRedis(923L, votingUsername);
+        userRedis2.setSvg("somesvg");
+
+        List<UserRedis> persistedUsers = new ArrayList<UserRedis>();
+        persistedUsers.add(userRedis1);
+        persistedUsers.add(userRedis2);
+        Room persistedRoom = new Room(roomId, null, RoomAccessTypeEnum.PUBLIC, RoomStatusEnum.VOTING, 10L, "pizza", Instant.now(), Instant.now().plusSeconds(10000L), 0, persistedUsers);
+        when(this.roomPersistenceService.findRoomById(roomId)).thenReturn(persistedRoom);
+
+        // Act
+        Room room = this.roomManagerService.doVote(roomId, votingUsername, targetUsername, rate);
+
+        // Assert
+        ArgumentCaptor<Room> roomCaptor = ArgumentCaptor.forClass(Room.class);
+        verify(this.roomPersistenceService, times(1)).saveRoom(roomCaptor.capture());
+
+        Room savedRoom = roomCaptor.getValue();
+        Assertions.assertThat(savedRoom.getUsers().get(0).getVoteCount()).isEqualTo(1L);
+        Assertions.assertThat(savedRoom.getUsers().get(0).getVoteSum()).isEqualTo(5.0);
+        Assertions.assertThat(savedRoom.getUsers().get(0).isVotedInCurrentDraw()).isEqualTo(false);
+        Assertions.assertThat(savedRoom.getUsers().get(1).isVotedInCurrentDraw()).isEqualTo(true);
+    }
+
+    @Test
+    public void doVote_WithInvalidRate_ThrowsInvalidRateException() {
+
+    }
+
+    @Test
+    public void doVote_WithInvalidVotingUser_ThrowsUserCannotVoteForHimselfException() {
+
+    }
+
+    @Test
+    public void doVote_WithInvalidTargetUser_ThrowsUserNotUpForVoteException() {
+
+    }
+
+    @Test
+    public void doVote_WithInvalidVotingUser_ThrowsUserAlreadyVotedException() {
+
+    }
+}

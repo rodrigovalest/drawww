@@ -5,10 +5,9 @@ import com.rodrigo.drawing_contest.dtos.websockets.request.CreatePrivateRoomRequ
 import com.rodrigo.drawing_contest.dtos.websockets.request.EnterInPrivateRoomRequestDto;
 import com.rodrigo.drawing_contest.dtos.websockets.request.FinalDrawRequestDto;
 import com.rodrigo.drawing_contest.dtos.websockets.request.VoteRequestDto;
-import com.rodrigo.drawing_contest.dtos.websockets.response.CreateRoomResponseDto;
-import com.rodrigo.drawing_contest.dtos.websockets.response.EnterInPrivateRoomResponseDto;
-import com.rodrigo.drawing_contest.dtos.websockets.response.StartingMatchResponseDto;
-import com.rodrigo.drawing_contest.dtos.websockets.response.WaitingRoomUpdateResponseDto;
+import com.rodrigo.drawing_contest.dtos.websockets.response.*;
+import com.rodrigo.drawing_contest.events.StartResultEvent;
+import com.rodrigo.drawing_contest.events.StartingVotingForNextDrawingEvent;
 import com.rodrigo.drawing_contest.models.room.Room;
 import com.rodrigo.drawing_contest.models.user.User;
 import com.rodrigo.drawing_contest.models.user.UserRedis;
@@ -16,19 +15,23 @@ import com.rodrigo.drawing_contest.services.RoomManagerService;
 import com.rodrigo.drawing_contest.services.RoomPersistenceService;
 import com.rodrigo.drawing_contest.services.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Controller
 public class GameController {
 
     private final SimpMessagingTemplate template;
-    private final RoomPersistenceService roomPersistenceService;
     private final RoomManagerService roomManagerService;
+    private final RoomPersistenceService roomPersistenceService;
     private final UserService userService;
 
     @MessageMapping("/rooms/private/create")
@@ -111,12 +114,12 @@ public class GameController {
     private void startGame(Room room) {
         room = this.roomManagerService.startGame(room.getId());
 
-        System.out.println("starting game at " + room.getStartTime().toString() + " with end at " + room.getEndTime().toString());
+        System.out.println("starting game at " + room.getStartTimePlaying().toString() + " with end at " + room.getEndTimePlaying().toString());
 
         WebSocketDto<?> allReadyDto = new WebSocketDto<>(
                 room.getStatus(),
                 "All players are ready. Starting the game...",
-                new StartingMatchResponseDto("pizza", room.getStartTime(), room.getEndTime())
+                new StartingMatchResponseDto("pizza", room.getStartTimePlaying(), room.getEndTimePlaying())
         );
         for (UserRedis userRedis : room.getUsers())
             template.convertAndSendToUser(userRedis.getUsername(), "/queue/reply", allReadyDto);
@@ -133,32 +136,56 @@ public class GameController {
                 "succesfully receive user draw"
         );
         this.template.convertAndSendToUser(username, "/queue/reply", responseDto);
+    }
 
-        if (room.getUsers().stream().allMatch(userRedis -> userRedis.getSvg() != null)) {
-            WebSocketDto<?> allReadyDto = new WebSocketDto<>(
-                    room.getStatus(),
-                    "received all draws. now it is time to vote"
-            );
-            for (UserRedis j : room.getUsers())
-                template.convertAndSendToUser(j.getUsername(), "/queue/reply", allReadyDto);
-        }
+    @EventListener
+    private void handleStartingVotingForNextDrawingEvent(StartingVotingForNextDrawingEvent event) {
+        Room room = event.getRoom();
+        room = this.roomManagerService.startVotingForNextDrawing(room.getId());
+        String targetUsername = room.getUsers().get(room.getCurrentVotingIndex()).getUsername();
+        String drawSvg = room.getUsers().get(room.getCurrentVotingIndex()).getSvg();
 
-//        // time to vote
-//        if (room.getUsers().stream().allMatch(userRedis -> userRedis.getSvg() != null)) {
-//            room = this.roomManagerService.startVoting(room.getId());
-//            System.out.println("TIME TO VOTE in room {" + room.getId() + "}");
-//
-//            for (UserRedis i : room.getUsers()) {
-//                WebSocketDto<?> allReadyDto = new WebSocketDto<>(
-//                        room.getStatus(),
-//                        "Vote to user x",
-//                        new StartingMatchResponseDto("pizza", room.getStartTime(), room.getEndTime())
-//                );
-//                for (UserRedis j : room.getUsers())
-//                    template.convertAndSendToUser(j.getUsername(), "/queue/reply", allReadyDto);
-//
-//                // wait to send their draw
-//            }
-//        }
+        WebSocketDto<?> responseDto = new WebSocketDto<>(
+                room.getStatus(),
+                "Vote to " + targetUsername,
+                new VotingResponseDto(targetUsername, drawSvg)
+        );
+        room.getUsers().forEach(u -> this.template.convertAndSendToUser(u.getUsername(), "/queue/reply", responseDto));
+    }
+
+    @MessageMapping("/rooms/send_vote")
+    public void receiveVotes(VoteRequestDto requestDto, Principal principal) {
+        String username = principal.getName();
+        User user = this.userService.findUserByUsername(username);
+        UUID roomId = this.roomPersistenceService.getRoomIdOfUser(user.getId());
+        Room room = this.roomManagerService.doVote(
+                roomId,
+                user.getUsername(),
+                requestDto.getUsername(),
+                requestDto.getRate()
+        );
+
+        WebSocketDto<?> dto = new WebSocketDto<>(
+                room.getStatus(),
+                "succesfully received vote"
+        );
+        room.getUsers().forEach(u -> this.template.convertAndSendToUser(u.getUsername(), "/queue/reply", dto));
+    }
+
+    @EventListener
+    private void handleStartResultEvent(StartResultEvent event) {
+        Room room = this.roomManagerService.startResult(event.getRoom().getId());
+
+        List<UserRatesDto> userRates = new ArrayList<>();
+        room.getUsers().forEach(user -> {
+            UserRatesDto userRate = new UserRatesDto(user.getUsername(), user.getVoteResult());
+            userRates.add(userRate);
+        });
+        WebSocketDto<?> responseDto = new WebSocketDto<>(
+                room.getStatus(),
+                "result of game",
+                new ResultResponseDto(userRates)
+        );
+        room.getUsers().forEach(u -> this.template.convertAndSendToUser(u.getUsername(), "/queue/reply", responseDto));
     }
 }
