@@ -158,12 +158,7 @@ public class GameController {
         String username = principal.getName();
         User user = this.userService.findUserByUsername(username);
         UUID roomId = this.roomPersistenceService.getRoomIdOfUser(user.getId());
-        Room room = this.roomManagerService.doVote(
-                roomId,
-                user.getUsername(),
-                requestDto.getUsername(),
-                requestDto.getRate()
-        );
+        Room room = this.roomManagerService.doVote(roomId, user.getUsername(), requestDto.getRate());
 
         WebSocketDto<?> dto = new WebSocketDto<>(
                 room.getStatus(),
