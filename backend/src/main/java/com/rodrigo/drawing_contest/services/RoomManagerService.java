@@ -117,6 +117,8 @@ public class RoomManagerService {
 
         if (room.getStatus() != RoomStatusEnum.WAITING)
             throw new ActionDoNotMatchWithRoomStatusException("cannot start game because room status are not WAITING");
+        if (!room.getUsers().stream().allMatch(userRedis -> userRedis.getStatus() == UserRedis.WaitingPlayerStatusEnum.READY))
+            throw new CannotStartMatchBecauseNotAllUsersAreReadyException("cannot start game because not all users are READY");
 
         Instant startTime = Instant.now().plus(Duration.ofSeconds(30));
         Instant endTime = startTime.plus(Duration.ofSeconds(10));
@@ -152,7 +154,7 @@ public class RoomManagerService {
     }
 
     @Transactional
-    private void handlePlayingTimeout(UUID roomId) {
+    public void handlePlayingTimeout(UUID roomId) {
         Room room = this.roomPersistenceService.findRoomById(roomId);
 
         if (room.getStatus() != RoomStatusEnum.PLAYING)
@@ -161,7 +163,6 @@ public class RoomManagerService {
         List<UserRedis> users = room.getUsers();
         for (UserRedis userRedis : users) {
             if (userRedis.getSvg() == null) {
-                System.out.println("user {" + userRedis.getUsername() + "} removed by inactivity");
                 User user = this.userService.findUserByUsername(userRedis.getUsername());
                 this.leaveRoom(user);
                 this.eventPublisher.publishEvent(new UserInactivityEvent(this, user.getUsername()));
