@@ -164,7 +164,7 @@ public class RoomManagerService {
         for (UserRedis userRedis : users) {
             if (userRedis.getSvg() == null) {
                 User user = this.userService.findUserByUsername(userRedis.getUsername());
-                this.leaveRoom(user);
+                room = this.leaveRoom(user);
                 this.eventPublisher.publishEvent(new UserInactivityEvent(this, user.getUsername()));
             }
         }

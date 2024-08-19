@@ -675,18 +675,18 @@ public class RoomManagerServiceTest {
 
         User user1 = new User(547L, "someusername", "encryptedpassword", LocalDateTime.of(2024, 1, 15, 10, 30), LocalDateTime.of(2024, 1, 15, 10, 30));
         User user2 = new User(15L, "someusername2", "encryptedpassword", LocalDateTime.of(2024, 1, 15, 10, 30), LocalDateTime.of(2024, 1, 15, 10, 30));
-        Room beforeRoom = new Room(roomId, null, RoomAccessTypeEnum.PUBLIC, RoomStatusEnum.PLAYING, 10L);
         UserRedis userRedis1 = new UserRedis(user1.getId(), user1.getUsername());
         UserRedis userRedis2 = new UserRedis(user2.getId(), user2.getUsername());
+
+        Room beforeRoom = new Room(roomId, null, RoomAccessTypeEnum.PUBLIC, RoomStatusEnum.PLAYING, 10L);
         userRedis2.setSvg("some_fake_draw_in_svg_format");
         beforeRoom.addUser(userRedis1);
         beforeRoom.addUser(userRedis2);
 
         when(this.roomPersistenceService.findRoomById(roomId)).thenReturn(beforeRoom);
         when(this.userService.findUserByUsername(userRedis1.getUsername())).thenReturn(user1);
-        when(this.userService.findUserByUsername(userRedis2.getUsername())).thenReturn(user2);
 
-        Room afterRoom = new Room(roomId, null, RoomAccessTypeEnum.PUBLIC, RoomStatusEnum.VOTING, 10L);
+        Room afterRoom = new Room(roomId, null, RoomAccessTypeEnum.PUBLIC, RoomStatusEnum.PLAYING, 10L);
         afterRoom.addUser(userRedis2);
         doReturn(afterRoom).when(roomManagerService).leaveRoom(user1);
 
@@ -696,12 +696,20 @@ public class RoomManagerServiceTest {
         // Assert
         verify(this.roomPersistenceService, times(1))
                 .findRoomById(roomId);
+
+        verify(this.userService, times(1))
+                .findUserByUsername(eq(userRedis1.getUsername()));
+        verify(this.userService, times(1))
+                .findUserByUsername(any());
+        verify(this.roomManagerService, times(1))
+                .leaveRoom(eq(user1));
+        verify(this.eventPublisher, times(1))
+                .publishEvent(any(UserInactivityEvent.class));
+
         verify(this.roomPersistenceService, times(1))
                 .saveRoom(eq(afterRoom));
         verify(this.eventPublisher, times(1))
                 .publishEvent(any(StartingVotingForNextDrawingEvent.class));
-        verify(this.eventPublisher, times(1))
-                .publishEvent(any(UserInactivityEvent.class));
     }
 
     @Test
