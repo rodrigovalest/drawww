@@ -1,5 +1,8 @@
 package com.rodrigo.drawing_contest.services;
 
+import com.rodrigo.drawing_contest.events.StartPlayingEvent;
+import com.rodrigo.drawing_contest.events.StartResultEvent;
+import com.rodrigo.drawing_contest.events.StartingVotingForNextDrawingEvent;
 import com.rodrigo.drawing_contest.events.UserInactivityEvent;
 import com.rodrigo.drawing_contest.exceptions.*;
 import com.rodrigo.drawing_contest.models.room.Room;
@@ -12,6 +15,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -112,40 +117,22 @@ public class RoomManagerService {
 
         if (room.getStatus() != RoomStatusEnum.WAITING)
             throw new ActionDoNotMatchWithRoomStatusException("cannot start game because room status are not WAITING");
+        if (!room.getUsers().stream().allMatch(userRedis -> userRedis.getStatus() == UserRedis.WaitingPlayerStatusEnum.READY))
+            throw new CannotStartMatchBecauseNotAllUsersAreReadyException("cannot start game because not all users are READY");
 
         Instant startTime = Instant.now().plus(Duration.ofSeconds(30));
-        Instant endTime = startTime.plus(Duration.ofMinutes(GAME_DURATION));
+        Instant endTime = startTime.plus(Duration.ofSeconds(10));
         room.setStatus(RoomStatusEnum.PLAYING);
-        room.setStartTime(startTime);
-        room.setEndTime(endTime);
+        room.setStartTimePlaying(startTime);
+        room.setEndTimePlaying(endTime);
 
         this.scheduler.schedule(() ->
-                this.checkDrawings(roomId),
+                this.handlePlayingTimeout(roomId),
                 Duration.between(Instant.now(), endTime.plusSeconds(10)).toMillis(),
                 TimeUnit.MILLISECONDS
         );
 
         return this.roomPersistenceService.saveRoom(room);
-    }
-
-    @Transactional
-    private void checkDrawings(UUID roomId) {
-        Room room = this.roomPersistenceService.findRoomById(roomId);
-        System.out.println(room.toString());
-
-        if (room.getStatus() != RoomStatusEnum.PLAYING)
-            throw new ActionDoNotMatchWithRoomStatusException("cannot check drawings because room status is not PLAYING");
-
-        List<UserRedis> users = room.getUsers();
-        for (UserRedis userRedis : users) {
-            System.out.println(userRedis.toString());
-            if (userRedis.getSvg() == null) {
-                System.out.println("user {" + userRedis.getUsername() + "} removed by inactivity");
-                User user = this.userService.findUserByUsername(userRedis.getUsername());
-                this.leaveRoom(user);
-                this.eventPublisher.publishEvent(new UserInactivityEvent(this, user.getUsername()));
-            }
-        }
     }
 
     @Transactional
@@ -167,13 +154,127 @@ public class RoomManagerService {
     }
 
     @Transactional
-    public Room startVoting(UUID roomId) {
+    public void handlePlayingTimeout(UUID roomId) {
         Room room = this.roomPersistenceService.findRoomById(roomId);
 
         if (room.getStatus() != RoomStatusEnum.PLAYING)
-            throw new ActionDoNotMatchWithRoomStatusException("cannot start voting because room status are not PLAYING");
+            throw new ActionDoNotMatchWithRoomStatusException("cannot check drawings because room status is not PLAYING");
+
+        List<UserRedis> users = room.getUsers();
+        for (UserRedis userRedis : users) {
+            if (userRedis.getSvg() == null) {
+                User user = this.userService.findUserByUsername(userRedis.getUsername());
+                this.leaveRoom(user);
+                this.eventPublisher.publishEvent(new UserInactivityEvent(this, user.getUsername()));
+            }
+        }
 
         room.setStatus(RoomStatusEnum.VOTING);
+        this.roomPersistenceService.saveRoom(room);
+        this.eventPublisher.publishEvent(new StartingVotingForNextDrawingEvent(this, room));
+    }
+
+    @Transactional
+    public Room startVotingForNextDrawing(UUID roomId) {
+        Room room = this.roomPersistenceService.findRoomById(roomId);
+
+        if (room.getStatus() != RoomStatusEnum.VOTING)
+            throw new ActionDoNotMatchWithRoomStatusException("cannot start voting because room status is not VOTING");
+
+        List<UserRedis> users = room.getUsers();
+        if (users.isEmpty())
+            throw new CannotStartVotingBecauseRoomIsEmptyException("cannot start VOTING because room is empty");
+
+        if (room.getCurrentVotingIndex() == null)
+            room.setCurrentVotingIndex(0);
+
+        this.scheduler.schedule(() -> this.handleVotingTimeout(roomId), Duration.ofSeconds(30).toMillis(), TimeUnit.MILLISECONDS);
+
         return this.roomPersistenceService.saveRoom(room);
+    }
+
+    @Transactional
+    private void handleVotingTimeout(UUID roomId) {
+        Room room = this.roomPersistenceService.findRoomById(roomId);
+
+        if (room.getStatus() != RoomStatusEnum.VOTING)
+            throw new ActionDoNotMatchWithRoomStatusException("cannot handle voting timeout because room status is not VOTING");
+
+        room.getUsers().forEach(u -> u.setVotedInCurrentDraw(false));
+        room.setCurrentVotingIndex(room.getCurrentVotingIndex() + 1);
+        this.roomPersistenceService.saveRoom(room);
+
+        if (room.getCurrentVotingIndex() < room.getUsers().size()) {
+            this.eventPublisher.publishEvent(new StartingVotingForNextDrawingEvent(this, room));
+        } else {
+            this.eventPublisher.publishEvent(new StartResultEvent(this, room));
+        }
+    }
+
+    @Transactional
+    public Room doVote(UUID roomId, String votingUsername, String targetUsername, Long rate) {
+        if (rate < 1L || rate > 5L)
+            throw new InvalidRateException("rate must be an integer between 1 and 5");
+
+        Room room = this.roomPersistenceService.findRoomById(roomId);
+
+        if (room.getStatus() != RoomStatusEnum.VOTING)
+            throw new ActionDoNotMatchWithRoomStatusException("cannot vote because room status is not VOTING");
+
+        List<UserRedis> users = room.getUsers();
+        UserRedis targetUserRedis = users.get(room.getCurrentVotingIndex());
+
+        UserRedis votingUser = users.stream()
+                .filter(user -> Objects.equals(user.getUsername(), votingUsername))
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("user {" + votingUsername + "} not found"));
+
+        if (!Objects.equals(targetUserRedis.getUsername(), targetUsername))
+            throw new UserNotUpForVoteException("cannot vote for user {" + targetUsername + "} because it is not the current voting target");
+        if (Objects.equals(targetUserRedis.getUsername(), votingUsername))
+            throw new UserCannotVoteForHimselfException("user cannot vote for himself");
+        if (votingUser.isVotedInCurrentDraw())
+            throw new UserAlreadyVotedException("user {" + votingUsername + "} has already voted in the current draw");
+
+        votingUser.setVotedInCurrentDraw(true);
+        targetUserRedis.setVoteCount(targetUserRedis.getVoteCount() + 1);
+        targetUserRedis.setVoteSum(targetUserRedis.getVoteSum() + rate);
+
+        users.replaceAll(user -> user.getUsername().equals(targetUsername) ? targetUserRedis : user);
+        room.setUsers(users);
+
+        return this.roomPersistenceService.saveRoom(room);
+    }
+
+    @Transactional
+    public Room startResult(UUID roomId) {
+        Room room = this.roomPersistenceService.findRoomById(roomId);
+
+        if (room.getStatus() != RoomStatusEnum.VOTING)
+            throw new ActionDoNotMatchWithRoomStatusException("cannot start result PHASE because room status is not VOTING");
+
+        room.setStatus(RoomStatusEnum.RESULT);
+        room.getUsers().forEach(user -> {
+            Long voteCount = user.getVoteCount();
+            Double voteSum = user.getVoteSum();
+
+            if (voteCount != 0) {
+                System.out.println(voteCount);
+                System.out.println(voteSum);
+
+                BigDecimal roundedVoteResult = new BigDecimal(voteSum / voteCount).setScale(1, RoundingMode.HALF_UP);
+                user.setVoteResult(roundedVoteResult.doubleValue());
+            }
+        });
+
+        Instant endTime = Instant.now().plus(Duration.ofSeconds(15));
+        this.scheduler.schedule(() -> this.gameEnd(roomId), endTime.toEpochMilli(), TimeUnit.MILLISECONDS);
+
+        return this.roomPersistenceService.saveRoom(room);
+    }
+
+    @Transactional
+    private void gameEnd(UUID roomId) {
+        this.roomPersistenceService.deleteRoom(roomId);
     }
 }

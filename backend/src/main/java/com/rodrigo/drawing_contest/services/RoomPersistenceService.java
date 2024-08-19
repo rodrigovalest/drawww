@@ -2,9 +2,6 @@ package com.rodrigo.drawing_contest.services;
 
 import com.rodrigo.drawing_contest.exceptions.*;
 import com.rodrigo.drawing_contest.models.room.Room;
-import com.rodrigo.drawing_contest.models.room.RoomAccessTypeEnum;
-import com.rodrigo.drawing_contest.models.room.RoomStatusEnum;
-import com.rodrigo.drawing_contest.models.user.User;
 import com.rodrigo.drawing_contest.models.user.UserRedis;
 import com.rodrigo.drawing_contest.repositories.RoomRepository;
 import com.rodrigo.drawing_contest.repositories.UserRoomRepository;
@@ -12,9 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Objects;
 import java.util.UUID;
 
 @RequiredArgsConstructor

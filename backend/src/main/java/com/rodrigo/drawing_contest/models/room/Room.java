@@ -22,8 +22,11 @@ public class Room {
     private RoomStatusEnum status;
     private Long size;
     private String theme;
-    private Instant startTime;
-    private Instant endTime;
+    private Instant startTimePlaying;
+    private Instant endTimePlaying;
+    private Instant startTimeVoting;
+    private Instant endTimeVoting;
+    private Integer currentVotingIndex = null;
     private List<UserRedis> users = new ArrayList<UserRedis>();
 
     public Room(UUID id, String password, RoomAccessTypeEnum accessType, RoomStatusEnum status, Long size) {
