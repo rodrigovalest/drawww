@@ -1,0 +1,21 @@
+<div class="bg-baseWhite w-full h-screen flex items-center justify-center">
+    <div>
+        <app-title title="Enter in private room" class="mb-4" />
+
+        <app-input text="Room ID" [control]="roomForm.controls.roomId" />
+        @if (roomForm.controls.roomId.invalid && (roomForm.controls.roomId.dirty || roomForm.controls.roomId.touched)) {
+            @if (roomForm.controls.roomId.errors?.['minlength'] || roomForm.controls.roomId.errors?.['required']) {
+                <app-input-error text="Room ID must not be empty" />
+            }
+        }
+
+        <app-input text="Password" [control]="roomForm.controls.password" type="password" />
+        @if (roomForm.controls.password.invalid && (roomForm.controls.password.dirty || roomForm.controls.password.touched)) {
+            @if (roomForm.controls.password.errors?.['minlength'] || roomForm.controls.password.errors?.['required']) {
+                <app-input-error text="Room password must not be empty." class="mb-3" />
+            }
+        }
+        
+        <app-button text="Enter" (buttonClicked)="onEnter()" />
+    </div>
+</div>

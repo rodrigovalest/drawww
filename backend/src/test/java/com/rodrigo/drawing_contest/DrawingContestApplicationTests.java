@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 class DrawingContestApplicationTests {
 
 	@Test
-	void contextLoads() {
+	public void runDrawingContestApplication_ShouldStart() {
+		DrawingContestApplication.main(new String[]{});
 	}
-
 }

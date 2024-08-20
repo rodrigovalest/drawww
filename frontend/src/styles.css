@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* tailwind font-extralight  */
+@font-face {
+    font-family: apercu;
+    src: url('/assets/fonts/apercu/apercu_light.otf') format('opentype');
+    font-weight: 200;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: apercu;
+    src: url('/assets/fonts/apercu/apercu_light-italic.otf') format('opentype');
+    font-weight: 200;
+    font-style: italic;
+}
+
+/* tailwind font-normal  */
+@font-face {
+    font-family: apercu;
+    src: url('/assets/fonts/apercu/apercu_regular.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: apercu;
+    src: url('/assets/fonts/apercu/apercu_italic.otf') format('opentype');
+    font-weight: 400;
+    font-style: italic;
+}
+
+/* tailwind font-bold  */
+@font-face {
+    font-family: apercu;
+    src: url('/assets/fonts/apercu/apercu_medium.otf') format('opentype');
+    font-weight: 700;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: apercu;
+    src: url('/assets/fonts/apercu/apercu_medium_italic.otf') format('opentype');
+    font-weight: 700;
+    font-style: italic;
+}
+
+/* tailwind font-bolder  */
+@font-face {
+    font-family: apercu;
+    src: url('/assets/fonts/apercu/apercu_bold.otf') format('opentype');
+    font-weight: 800;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: apercu;
+    src: url('/assets/fonts/apercu/apercu_bold_italic.otf') format('opentype');
+    font-weight: 800;
+    font-style: italic;
+}

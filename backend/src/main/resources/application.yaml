@@ -11,9 +11,20 @@ spring:
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+  security:
+    jwt:
+      secret-key: ${JWT_SECRET_KEY}
+
+  redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
+
   jpa:
     hibernate:
       ddl-auto: update
 
 server:
   port: 8080
+
+frontend:
+  url: ${FRONTEND_URL}
