@@ -26,7 +26,7 @@ public class Room {
     private Instant endTimePlaying;
     private Instant startTimeVoting;
     private Instant endTimeVoting;
-    private Integer currentVotingIndex = null;
+    private Integer currentVotingIndex = 0;
     private List<UserRedis> users = new ArrayList<UserRedis>();
 
     public Room(UUID id, String password, RoomAccessTypeEnum accessType, RoomStatusEnum status, Long size) {
