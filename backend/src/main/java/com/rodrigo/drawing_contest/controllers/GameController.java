@@ -148,7 +148,7 @@ public class GameController {
         WebSocketDto<?> responseDto = new WebSocketDto<>(
                 room.getStatus(),
                 "Vote to " + targetUsername,
-                new VotingResponseDto(targetUsername, drawSvg)
+                new VotingResponseDto(targetUsername, drawSvg, room.getStartTimeVoting(), room.getEndTimeVoting())
         );
         room.getUsers().forEach(u -> this.template.convertAndSendToUser(u.getUsername(), "/queue/reply", responseDto));
     }
@@ -160,11 +160,11 @@ public class GameController {
         UUID roomId = this.roomPersistenceService.getRoomIdOfUser(user.getId());
         Room room = this.roomManagerService.doVote(roomId, user.getUsername(), requestDto.getRate());
 
-        WebSocketDto<?> dto = new WebSocketDto<>(
+        WebSocketDto<?> responseDto = new WebSocketDto<>(
                 room.getStatus(),
                 "succesfully received vote"
         );
-        room.getUsers().forEach(u -> this.template.convertAndSendToUser(u.getUsername(), "/queue/reply", dto));
+        this.template.convertAndSendToUser(username, "/queue/reply", responseDto);
     }
 
     @EventListener

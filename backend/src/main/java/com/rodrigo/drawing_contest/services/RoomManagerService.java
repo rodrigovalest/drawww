@@ -1,6 +1,5 @@
 package com.rodrigo.drawing_contest.services;
 
-import com.rodrigo.drawing_contest.events.StartPlayingEvent;
 import com.rodrigo.drawing_contest.events.StartResultEvent;
 import com.rodrigo.drawing_contest.events.StartingVotingForNextDrawingEvent;
 import com.rodrigo.drawing_contest.events.UserInactivityEvent;
@@ -188,6 +187,11 @@ public class RoomManagerService {
         List<UserRedis> users = room.getUsers();
         if (users.isEmpty())
             throw new CannotStartVotingBecauseRoomIsEmptyException("cannot start VOTING because room is empty");
+
+        Instant startVotingTime = Instant.now().plusSeconds(5);
+        Instant endVotingTime = startVotingTime.plus(Duration.ofSeconds(VOTING_DURATION_SECONDS));
+        room.setStartTimeVoting(startVotingTime);
+        room.setEndTimeVoting(endVotingTime);
 
         this.scheduler.schedule(
                 () -> this.handleVotingTimeout(roomId),
