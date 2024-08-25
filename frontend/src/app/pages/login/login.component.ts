@@ -48,6 +48,8 @@ export class LoginComponent {
     this.authService.doLogin(user).subscribe({
       next: (data) => {
         this.authService.setToken(data.token);
+        localStorage.setItem('username', user.username);
+        localStorage.setItem('password', user.password);
         this.router.navigate(['']);
       },
       error: (httpError: HttpErrorResponse) => console.log(httpError)

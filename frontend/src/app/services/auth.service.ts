@@ -9,16 +9,15 @@ import { ILoginResponse } from '../interfaces/login-response.interface';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = environment.apiUrl;
 
   constructor(private httpClient: HttpClient) {}
 
   doLogin(user: IUser): Observable<ILoginResponse> {
-    return this.httpClient.post<ILoginResponse>(`${this.apiUrl}/api/v1/users/login`, user);
+    return this.httpClient.post<ILoginResponse>(`${environment.httpApiUrl}/api/v1/users/login`, user);
   }
   
   doSignUp(user: IUser): Observable<null> {
-    return this.httpClient.post<null>(`${this.apiUrl}/api/v1/users/register`, user);
+    return this.httpClient.post<null>(`${environment.httpApiUrl}/api/v1/users/register`, user);
   }
 
   setToken(token: string): void {

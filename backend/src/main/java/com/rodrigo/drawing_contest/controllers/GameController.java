@@ -47,7 +47,7 @@ public class GameController {
         WebSocketDto<CreateRoomResponseDto> responseDto = new WebSocketDto<>(
                 room.getStatus(),
                 "room {" + room.getId() + "} succesfully created",
-                new CreateRoomResponseDto(room.getId())
+                new CreateRoomResponseDto(room.getId(), room.getUsers())
         );
         this.template.convertAndSendToUser(username, "/queue/reply", responseDto);
     }
@@ -68,7 +68,7 @@ public class GameController {
         WebSocketDto<WaitingRoomUpdateResponseDto> updatedRoomDto = new WebSocketDto<>(
                 room.getStatus(),
                 "updated room",
-                new WaitingRoomUpdateResponseDto(room.getUsers())
+                new WaitingRoomUpdateResponseDto(room.getId(), room.getUsers())
         );
         for (UserRedis userRedis : room.getUsers())
             this.template.convertAndSendToUser(userRedis.getUsername(), "/queue/reply", updatedRoomDto);
@@ -87,7 +87,7 @@ public class GameController {
             WebSocketDto<WaitingRoomUpdateResponseDto> updatedRoomDto = new WebSocketDto<>(
                     room.getStatus(),
                     "updated room",
-                    new WaitingRoomUpdateResponseDto(room.getUsers())
+                    new WaitingRoomUpdateResponseDto(room.getId(), room.getUsers())
             );
             room.getUsers().forEach(u -> this.template.convertAndSendToUser(u.getUsername(), "/queue/reply", updatedRoomDto));
         }
@@ -105,7 +105,7 @@ public class GameController {
         WebSocketDto<WaitingRoomUpdateResponseDto> updatedRoomDto = new WebSocketDto<>(
                 room.getStatus(),
                 "updated room",
-                new WaitingRoomUpdateResponseDto(room.getUsers())
+                new WaitingRoomUpdateResponseDto(room.getId(), room.getUsers())
         );
         room.getUsers().forEach(u -> this.template.convertAndSendToUser(u.getUsername(), "/queue/reply", updatedRoomDto));
 
