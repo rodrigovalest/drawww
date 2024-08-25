@@ -1,14 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { ButtonComponent } from '../../components/button/button.component';
-import { InputErrorComponent } from '../../components/input-error/input-error.component';
-import { InputComponent } from '../../components/input/input.component';
-import { TitleComponent } from '../../components/title/title.component';
+import { ButtonComponent } from '../button/button.component';
+import { InputErrorComponent } from '../input-error/input-error.component';
+import { InputComponent } from '../input/input.component';
+import { TitleComponent } from '../title/title.component';
 import { RxStompService } from '../../services/rx-stomp.service';
 import { IRoomEnter } from '../../interfaces/room-enter.interface';
-import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
-import { BackIconComponent } from "../../components/back-icon/back-icon.component";
+import { BackIconComponent } from "../back-icon/back-icon.component";
 
 @Component({
   selector: 'app-enter-in-private-room',
@@ -16,7 +15,7 @@ import { BackIconComponent } from "../../components/back-icon/back-icon.componen
   imports: [TitleComponent, InputErrorComponent, InputComponent, ButtonComponent, BackIconComponent],
   templateUrl: './enter-in-private-room.component.html'
 })
-export class EnterInPrivateRoomComponent {
+export class EnterInPrivateRoomComponent implements OnInit {
   
   roomForm: FormGroup<{ 
     roomId: FormControl<string>; 

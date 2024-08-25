@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { ButtonComponent } from '../../components/button/button.component';
-import { TitleComponent } from '../../components/title/title.component';
-import { UserIconComponent } from '../../components/user-icon/user-icon.component';
+import { ButtonComponent } from '../button/button.component';
+import { TitleComponent } from '../title/title.component';
+import { UserIconComponent } from '../user-icon/user-icon.component';
 import { RxStompService } from '../../services/rx-stomp.service';
 import { IUserWaiting } from '../../interfaces/user-waiting.interface';
-import { BackIconComponent } from "../../components/back-icon/back-icon.component";
+import { BackIconComponent } from "../back-icon/back-icon.component";
 
 @Component({
   selector: 'app-waiting',

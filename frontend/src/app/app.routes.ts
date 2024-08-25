@@ -8,7 +8,7 @@ import { LogoutComponent } from './pages/logout/logout.component';
 import { PrivateRoomComponent } from './pages/private-room/private-room.component';
 import { GameComponent } from './pages/game/game.component';
 import { CreatePrivateRoomComponent } from './pages/create-private-room/create-private-room.component';
-import { EnterInPrivateRoomComponent } from './pages/enter-in-private-room/enter-in-private-room.component';
+import { EnterInPrivateRoomComponent } from './components/enter-in-private-room/enter-in-private-room.component';
 
 export const routes: Routes = [
     { path: "", component: HomeComponent, canActivate: [authGuard] },

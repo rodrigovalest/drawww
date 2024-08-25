@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { RxStompService } from '../../services/rx-stomp.service';
 import { GameStateType } from '../../types/game-state.type';
-import { WaitingComponent } from "../waiting/waiting.component";
+import { WaitingComponent } from "../../components/waiting/waiting.component";
 
 @Component({
   selector: 'app-game',
@@ -10,7 +10,7 @@ import { WaitingComponent } from "../waiting/waiting.component";
   imports: [WaitingComponent],
   templateUrl: './game.component.html'
 })
-export class GameComponent {
+export class GameComponent implements OnInit, OnDestroy {
 
   gameState: GameStateType = 'NOT_STARTED';
 
