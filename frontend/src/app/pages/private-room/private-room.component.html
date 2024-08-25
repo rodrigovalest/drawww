@@ -1,0 +1,12 @@
+<div class="bg-baseWhite w-full h-screen flex items-center justify-center">
+    <div class="absolute top-0 right-0 p-4">
+        <app-back-icon />
+    </div>
+
+    <div>
+        <app-title title="Private room" class="mb-4" />
+        
+        <app-button text="Enter in a room" (buttonClicked)="onEnterInPrivateRoom()" class="mb-4" />
+        <app-button text="Create a room" (buttonClicked)="onCreateAPrivateRoom()" />
+    </div>
+</div>

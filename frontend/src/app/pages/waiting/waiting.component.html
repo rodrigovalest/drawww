@@ -1,4 +1,8 @@
 <div class="bg-baseWhite w-full h-screen flex items-center justify-center">
+    <div class="absolute top-0 right-0 p-4">
+        <app-back-icon />
+    </div>
+    
     <div>
         <app-title title="Waiting..." class="mb-4" />
 
@@ -7,11 +11,9 @@
         </p>
 
         <div class="flex mb-4 max-w-[400px]">
-            <app-user-icon class="mr-2" />
-            <app-user-icon class="mr-2" />
-            <app-user-icon class="mr-2" />
-            <app-user-icon class="mr-2" />
-            <app-user-icon class="mr-2" />
+            @for (user of users; track $index) {
+                <app-user-icon class="mr-2" />
+            }
         </div>
         
         <app-button text="Ready" (buttonClicked)="onReady()" />

@@ -1,0 +1,18 @@
+<div class="bg-baseWhite w-full h-screen flex items-center justify-center">
+    <div class="absolute top-0 right-0 p-4">
+        <app-back-icon />
+    </div>
+
+    <div>
+        <app-title title="Create a private room" class="mb-4" />
+
+        <app-input text="Password" [control]="roomForm.controls.roomPassword" type="password" />
+        @if (roomForm.controls.roomPassword.invalid && (roomForm.controls.roomPassword.dirty || roomForm.controls.roomPassword.touched)) {
+            @if (roomForm.controls.roomPassword.errors?.['minlength'] || roomForm.controls.roomPassword.errors?.['required']) {
+                <app-input-error text="Room password must not be empty." class="mb-3" />
+            }
+        }
+        
+        <app-button text="Enter" (buttonClicked)="onCreate()" />
+    </div>
+</div>
