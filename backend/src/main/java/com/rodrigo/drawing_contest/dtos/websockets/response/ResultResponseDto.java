@@ -9,5 +9,6 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 public class ResultResponseDto {
+    private String theme;
     private List<UserRatesDto> rates = new ArrayList<UserRatesDto>();
 }

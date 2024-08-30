@@ -13,7 +13,7 @@ public class UserRedis {
     private Long userId;
     private String username;
     private WaitingPlayerStatusEnum status = WaitingPlayerStatusEnum.WAITING;
-    private String svg = null;
+    private byte[] svg = null;
     private Long voteCount = 0L;
     private Double voteSum = 0.0;
     private Double voteResult = 0.0;

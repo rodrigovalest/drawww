@@ -1,5 +1,7 @@
 package com.rodrigo.drawing_contest.config.websockets;
 
+import com.rodrigo.drawing_contest.services.RoomManagerService;
+import com.rodrigo.drawing_contest.services.UserService;
 import com.rodrigo.drawing_contest.services.WebSocketAuthenticatorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.Message;
@@ -16,9 +18,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthChannelInterceptorAdapter implements ChannelInterceptor {
 
-    private static final String USERNAME_HEADER = "login";
-    private static final String PASSWORD_HEADER = "passcode";
     private final WebSocketAuthenticatorService webSocketAuthenticatorService;
+    private final RoomManagerService roomManagerService;
+    private final UserService userService;
 
     @Override
     public Message<?> preSend(final Message<?> message, final MessageChannel channel) throws AuthenticationException {

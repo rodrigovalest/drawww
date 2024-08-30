@@ -1,0 +1,19 @@
+@if (gameState === 'WAITING') {
+    <app-waiting />
+}
+
+@else if (gameState === 'PLAYING') {
+    <app-playing />
+}
+
+@else if (gameState === 'VOTING') {
+    <app-voting />
+}
+
+@else if (gameState === 'RESULT') {
+    <app-result />
+}
+
+@else if (gameState === 'NOT_STARTED') {
+    <p>not expecting 'NOT_STARTED'</p>
+}

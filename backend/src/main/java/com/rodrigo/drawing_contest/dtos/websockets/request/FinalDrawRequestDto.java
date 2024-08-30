@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 @Data
 public class FinalDrawRequestDto {
     @NotEmpty(message = "draw image must not be empty")
-    private String draw;
+    private byte[] draw;
 }

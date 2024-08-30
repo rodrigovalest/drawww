@@ -3,11 +3,15 @@ package com.rodrigo.drawing_contest.controllers;
 import com.rodrigo.drawing_contest.dtos.websockets.WebSocketErrorDto;
 import com.rodrigo.drawing_contest.events.UserInactivityEvent;
 import com.rodrigo.drawing_contest.exceptions.*;
+import com.rodrigo.drawing_contest.services.RoomManagerService;
+import com.rodrigo.drawing_contest.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import java.security.Principal;
 
@@ -65,6 +69,7 @@ public class WebSocketExceptionHandler {
     public void handleUserInactivity(UserInactivityEvent event) {
         String username = event.getUsername();
         WebSocketErrorDto<?> responseDto = new WebSocketErrorDto<>("user disconnected by inactivity");
+        System.out.println("disconnecting user {" + username + "} by inactivity");
         this.template.convertAndSendToUser(username, "/queue/reply", responseDto);
     }
 }

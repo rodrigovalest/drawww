@@ -6,9 +6,11 @@ import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @AllArgsConstructor
 @Data
 public class WaitingRoomUpdateResponseDto {
+    private UUID roomId;
     private List<UserRedis> users = new ArrayList<UserRedis>();
 }
