@@ -5,11 +5,12 @@ import { GameStateType } from '../../types/game-state.type';
 import { WaitingComponent } from "../../components/waiting/waiting.component";
 import { PlayingComponent } from "../../components/playing/playing.component";
 import { VotingComponent } from "../../components/voting/voting.component";
+import { ResultComponent } from "../../components/result/result.component";
 
 @Component({
   selector: 'app-game',
   standalone: true,
-  imports: [WaitingComponent, PlayingComponent, VotingComponent],
+  imports: [WaitingComponent, PlayingComponent, VotingComponent, ResultComponent],
   templateUrl: './game.component.html'
 })
 export class GameComponent implements OnInit, OnDestroy {

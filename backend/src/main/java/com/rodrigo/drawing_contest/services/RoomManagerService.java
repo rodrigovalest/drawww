@@ -130,7 +130,7 @@ public class RoomManagerService {
 
         this.scheduler.schedule(() ->
                 this.handlePlayingTimeout(roomId),
-                Duration.between(Instant.now(), endTime.plus(Duration.ofMinutes(GAME_DURATION_MINUTES))).toMillis(),
+                Duration.between(startTime, endTime.plus(Duration.ofMinutes(GAME_DURATION_MINUTES))).toMillis(),
                 TimeUnit.MILLISECONDS
         );
 
@@ -170,6 +170,7 @@ public class RoomManagerService {
         for (UserRedis userRedis : users) {
             if (userRedis.getSvg() == null) {
                 User user = this.userService.findUserByUsername(userRedis.getUsername());
+                System.out.println("disconnecting user: " + user.toString());
                 room = this.leaveRoom(user);
                 this.eventPublisher.publishEvent(new UserInactivityEvent(this, user.getUsername()));
             }
@@ -191,7 +192,7 @@ public class RoomManagerService {
         if (users.isEmpty())
             throw new CannotStartVotingBecauseRoomIsEmptyException("cannot start VOTING because room is empty");
 
-        Instant startVotingTime = Instant.now().plusSeconds(5);
+        Instant startVotingTime = Instant.now().plusSeconds(2);
         Instant endVotingTime = startVotingTime.plus(Duration.ofSeconds(VOTING_DURATION_SECONDS));
         room.setStartTimeVoting(startVotingTime);
         room.setEndTimeVoting(endVotingTime);

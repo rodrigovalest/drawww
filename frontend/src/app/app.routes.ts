@@ -10,9 +10,6 @@ import { GameComponent } from './pages/game/game.component';
 import { CreatePrivateRoomComponent } from './components/create-private-room/create-private-room.component';
 import { EnterInPrivateRoomComponent } from './components/enter-in-private-room/enter-in-private-room.component';
 
-import { PlayingComponent } from './components/playing/playing.component';
-import { VotingComponent } from './components/voting/voting.component';
-
 export const routes: Routes = [
     { path: "", component: HomeComponent, canActivate: [authGuard] },
     { path: "logout", component: LogoutComponent },
@@ -22,6 +19,5 @@ export const routes: Routes = [
     { path: "private/game", component: GameComponent, canActivate: [authGuard] },
     { path: "private/create", component: CreatePrivateRoomComponent, canActivate: [authGuard] },
     { path: "private/enter", component: EnterInPrivateRoomComponent, canActivate: [authGuard] },
-    { path: "test", component: VotingComponent },    
     { path: '**', component: PageNotFoundComponent }
 ];

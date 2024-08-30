@@ -181,7 +181,7 @@ public class GameController {
         WebSocketDto<?> responseDto = new WebSocketDto<>(
                 room.getStatus(),
                 "result of game",
-                new ResultResponseDto(userRates)
+                new ResultResponseDto(room.getTheme(), userRates)
         );
         room.getUsers().forEach(u -> this.template.convertAndSendToUser(u.getUsername(), "/queue/reply", responseDto));
     }

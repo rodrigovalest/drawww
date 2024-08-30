@@ -1,16 +1,20 @@
 <div class="bg-baseWhite w-full h-screen flex items-center justify-center">
-    <div class="absolute top-0 right-0 p-4">
+    <div class="absolute top-0 right-0 p-3">
         <app-back-icon />
     </div>
 
-    <div class="w-5/6">
-        @for (user of users; track $index) {
-            <div class="flex justify-between">
+    <div>
+        <div class="flex justify-between w-[800px] mb-4">
+            <p class="inline-block font-apercu text-3xl font-semibold text-baseBlack">{{ theme }}</p>
+        </div>
+
+        @for (userRate of userRates; track $index) {
+            <div class="flex justify-between my-1">
                 <div>
-                    <p class="inline-block">Xth</p>
-                    <p class="inline-block">username</p>
+                    <p class="inline-block font-apercu text-baseBlack mr-5">{{ userRate.position }}</p>
+                    <p class="inline-block font-apercu text-baseBlack mr-5">{{ userRate.username }}</p>
                 </div>
-                <p class="inline-block">rating</p>
+                <p class="inline-block font-apercu text-baseBlack mr-5">{{ userRate.averageRate }}</p>
             </div>
         }
     </div>
