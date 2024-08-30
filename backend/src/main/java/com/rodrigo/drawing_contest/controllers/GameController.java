@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
@@ -126,10 +127,11 @@ public class GameController {
     }
 
     @MessageMapping("/rooms/send_draw")
-    public void receiveUsersDraw(FinalDrawRequestDto requestDto, Principal principal) {
+    public void receiveUsersDraw(@Payload byte[] payload, Principal principal) {
+        System.out.println("receiving user draw: " + payload.length);
         String username = principal.getName();
         User user = this.userService.findUserByUsername(username);
-        Room room = this.roomManagerService.setUserDraw(user, requestDto.getDraw());
+        Room room = this.roomManagerService.setUserDraw(user, payload);
 
         WebSocketDto<?> responseDto = new WebSocketDto<>(
                 room.getStatus(),
@@ -143,12 +145,12 @@ public class GameController {
         Room room = event.getRoom();
         room = this.roomManagerService.startVotingForNextDrawing(room.getId());
         String targetUsername = room.getUsers().get(room.getCurrentVotingIndex()).getUsername();
-        String drawSvg = room.getUsers().get(room.getCurrentVotingIndex()).getSvg();
+        byte[] drawSvg = room.getUsers().get(room.getCurrentVotingIndex()).getSvg();
 
         WebSocketDto<?> responseDto = new WebSocketDto<>(
                 room.getStatus(),
                 "Vote to " + targetUsername,
-                new VotingResponseDto(targetUsername, drawSvg, room.getStartTimeVoting(), room.getEndTimeVoting())
+                new VotingResponseDto(drawSvg, targetUsername, room.getTheme(), room.getStartTimeVoting(), room.getEndTimeVoting())
         );
         room.getUsers().forEach(u -> this.template.convertAndSendToUser(u.getUsername(), "/queue/reply", responseDto));
     }

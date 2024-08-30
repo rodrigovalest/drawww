@@ -1,0 +1,17 @@
+<div class="bg-baseWhite w-full h-screen flex items-center justify-center">
+    <div class="absolute top-0 right-0 p-4">
+        <app-back-icon />
+    </div>
+
+    <div class="w-5/6">
+        @for (user of users; track $index) {
+            <div class="flex justify-between">
+                <div>
+                    <p class="inline-block">Xth</p>
+                    <p class="inline-block">username</p>
+                </div>
+                <p class="inline-block">rating</p>
+            </div>
+        }
+    </div>
+</div>

@@ -69,6 +69,7 @@ public class WebSocketExceptionHandler {
     public void handleUserInactivity(UserInactivityEvent event) {
         String username = event.getUsername();
         WebSocketErrorDto<?> responseDto = new WebSocketErrorDto<>("user disconnected by inactivity");
+        System.out.println("disconnecting user {" + username + "} by inactivity");
         this.template.convertAndSendToUser(username, "/queue/reply", responseDto);
     }
 }

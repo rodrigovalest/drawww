@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ButtonComponent } from '../button/button.component';
 import { TitleComponent } from '../title/title.component';
 import { UserIconComponent } from '../user-icon/user-icon.component';
@@ -12,7 +12,7 @@ import { BackIconComponent } from "../back-icon/back-icon.component";
   imports: [TitleComponent, ButtonComponent, UserIconComponent, BackIconComponent],
   templateUrl: './waiting.component.html',
 })
-export class WaitingComponent {
+export class WaitingComponent implements OnInit {
   roomId: string = '';
   users: IUserWaiting[] = [];
 
