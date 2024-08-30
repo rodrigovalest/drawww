@@ -16,6 +16,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
+import java.time.Instant;
+
 @RequiredArgsConstructor
 @Component
 public class WebSocketEventListener {
@@ -27,12 +29,13 @@ public class WebSocketEventListener {
 
     @EventListener
     public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
+        System.out.println(event.toString());
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         var user = (UsernamePasswordAuthenticationToken) headerAccessor.getUser();
 
         if (user != null) {
             String username = user.getName();
-            System.out.println("User disconnected: " + username);
+            System.out.println("(web socket disconnected event) user {" + username + "} disconnected at " + Instant.now());
             User userEntity = this.userService.findUserByUsername(username);
 
             if (this.roomPersistenceService.getRoomIdOfUser(userEntity.getId()) != null) {

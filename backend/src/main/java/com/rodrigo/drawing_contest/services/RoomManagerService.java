@@ -33,7 +33,7 @@ public class RoomManagerService {
     private final RoomPersistenceService roomPersistenceService;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private final ApplicationEventPublisher eventPublisher;
-    private static final int GAME_DURATION_MINUTES = 2;
+    private static final int GAME_DURATION_MINUTES = 1;
     private static final int VOTING_DURATION_SECONDS = 45;
 
     @Transactional
@@ -120,15 +120,17 @@ public class RoomManagerService {
         if (!room.getUsers().stream().allMatch(userRedis -> userRedis.getStatus() == UserRedis.WaitingPlayerStatusEnum.READY))
             throw new CannotStartMatchBecauseNotAllUsersAreReadyException("cannot start game because not all users are READY");
 
-        Instant startTime = Instant.now().plus(Duration.ofSeconds(30));
-        Instant endTime = startTime.plus(Duration.ofSeconds(10));
+        Instant startTime = Instant.now().plus(Duration.ofSeconds(3));
+        Instant endTime = startTime.plus(Duration.ofMinutes(GAME_DURATION_MINUTES));
         room.setStatus(RoomStatusEnum.PLAYING);
         room.setStartTimePlaying(startTime);
         room.setEndTimePlaying(endTime);
 
+        System.out.println("Starting game at: " + startTime + ". With end at: " + endTime);
+
         this.scheduler.schedule(() ->
                 this.handlePlayingTimeout(roomId),
-                Duration.between(Instant.now(), endTime.plus(Duration.ofMinutes(GAME_DURATION_MINUTES))).toMillis(),
+                Duration.between(startTime, endTime.plus(Duration.ofMinutes(GAME_DURATION_MINUTES))).toMillis(),
                 TimeUnit.MILLISECONDS
         );
 
@@ -136,7 +138,7 @@ public class RoomManagerService {
     }
 
     @Transactional
-    public Room setUserDraw(User user, String drawSvg) {
+    public Room setUserDraw(User user, byte[] drawSvg) {
         UUID roomId = this.roomPersistenceService.getRoomIdOfUser(user.getId());
         if (roomId == null)
             throw new UserIsNotInAnyRoomException("cannot leave room because user {" + user.getId() + "} is not in any room");
@@ -159,6 +161,7 @@ public class RoomManagerService {
     @Transactional
     public void handlePlayingTimeout(UUID roomId) {
         Room room = this.roomPersistenceService.findRoomById(roomId);
+        System.out.println("GAME END at: " + Instant.now() + ". Expected endTime of room: " + room.getEndTimePlaying());
 
         if (room.getStatus() != RoomStatusEnum.PLAYING)
             throw new ActionDoNotMatchWithRoomStatusException("cannot check drawings because room status is not PLAYING");
@@ -167,6 +170,7 @@ public class RoomManagerService {
         for (UserRedis userRedis : users) {
             if (userRedis.getSvg() == null) {
                 User user = this.userService.findUserByUsername(userRedis.getUsername());
+                System.out.println("disconnecting user: " + user.toString());
                 room = this.leaveRoom(user);
                 this.eventPublisher.publishEvent(new UserInactivityEvent(this, user.getUsername()));
             }
@@ -188,7 +192,7 @@ public class RoomManagerService {
         if (users.isEmpty())
             throw new CannotStartVotingBecauseRoomIsEmptyException("cannot start VOTING because room is empty");
 
-        Instant startVotingTime = Instant.now().plusSeconds(5);
+        Instant startVotingTime = Instant.now().plusSeconds(2);
         Instant endVotingTime = startVotingTime.plus(Duration.ofSeconds(VOTING_DURATION_SECONDS));
         room.setStartTimeVoting(startVotingTime);
         room.setEndTimeVoting(endVotingTime);

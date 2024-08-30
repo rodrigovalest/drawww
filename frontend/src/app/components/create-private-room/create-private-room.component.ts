@@ -15,7 +15,7 @@ import { BackIconComponent } from "../../components/back-icon/back-icon.componen
   imports: [TitleComponent, InputComponent, ButtonComponent, InputErrorComponent, BackIconComponent],
   templateUrl: './create-private-room.component.html',
 })
-export class CreatePrivateRoomComponent {
+export class CreatePrivateRoomComponent implements OnInit {
 
   roomForm: FormGroup<{ 
     roomPassword: FormControl<string>; 

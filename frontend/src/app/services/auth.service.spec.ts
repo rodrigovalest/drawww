@@ -8,7 +8,7 @@ import { environment } from '../environments/environment';
 import { ILoginResponse } from '../interfaces/login-response.interface';
 
 describe('AuthService', () => {
-  let apiUrl = environment.apiUrl
+  let apiUrl = environment.httpApiUrl;
   let authService: AuthService;
   let httpMock: HttpTestingController;
 
