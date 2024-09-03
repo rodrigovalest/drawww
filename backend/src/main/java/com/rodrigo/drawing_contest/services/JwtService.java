@@ -7,6 +7,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 
+@RequiredArgsConstructor
 @Service
 public class JwtService {
 
@@ -25,6 +27,7 @@ public class JwtService {
     private final long EXPIRE_DAYS = 0;
     private final long EXPIRE_HOURS = 2;
     private final long EXPIRE_MINUTES = 30;
+    private final UserService userService;
 
     public String createToken(User user) {
         Date issuedAt = new Date();
@@ -54,6 +57,32 @@ public class JwtService {
             throw new InvalidJwtTokenException("invalid bearer token");
         }
     }
+
+    public boolean isTokenValid(String token) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(Keys.hmacShaKeyFor(this.SECRET_KEY.getBytes(StandardCharsets.UTF_8)))
+                    .build()
+                    .parseClaimsJws(this.refactorToken(token));
+
+            return true;
+        } catch (JwtException e) {
+            return false;
+        }
+    }
+
+    public String refreshToken(String oldToken) {
+        try {
+            this.validateToken(oldToken);
+            String username = this.getUsernameByToken(oldToken);
+            User user = this.userService.findUserByUsername(username);
+
+            return this.createToken(user);
+        } catch (Exception e) {
+            throw new InvalidJwtTokenException("old bearer token is invalid or expired");
+        }
+    }
+
 
     public String getUsernameByToken(String token) {
         try {
