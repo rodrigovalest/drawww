@@ -26,14 +26,15 @@ export class VotingComponent {
       
         switch (response.roomStatus) {
           case 'VOTING':
-            const base64String = response.data.drawSvg;
-            const binaryString = atob(base64String);
+            // const base64String = response.data.drawSvg;
+            // const binaryString = atob(base64String);
 
-            const uint8Array = new Uint8Array(binaryString.length);
-            for (let i = 0; i < binaryString.length; i++)
-              uint8Array[i] = binaryString.charCodeAt(i);
+            // const uint8Array = new Uint8Array(binaryString.length);
+            // for (let i = 0; i < binaryString.length; i++)
+            //   uint8Array[i] = binaryString.charCodeAt(i);
 
-            this.draw = CompressionService.decompressSVG(uint8Array);
+            // this.draw = CompressionService.decompressSVG(uint8Array);
+            this.draw = response.data.svgDraw;
             console.log(this.draw);
             this.username = response.data.targetUsername;
             this.theme = response.data.theme;

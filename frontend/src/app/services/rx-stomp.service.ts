@@ -6,7 +6,6 @@ import { IRoomCreate } from '../interfaces/room-create.interface';
 import { IRoomEnter } from '../interfaces/room-enter.interface';
 import { IWebSocketResponse } from '../interfaces/websocket-response.interface';
 import { GameStateType } from '../types/game-state.type';
-import { ISendUserDraw } from '../interfaces/send-draw.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -82,10 +81,6 @@ export class RxStompService extends RxStomp {
 
   changeUserStatus() {
     this.publish({ destination: '/app/rooms/user_status' });
-  }
-
-  sendUserDraw(binaryDraw: Uint8Array) {
-    this.publish({ destination: '/app/rooms/send_draw',  binaryBody: binaryDraw });
   }
 
   sendUserVote(rate: number) {

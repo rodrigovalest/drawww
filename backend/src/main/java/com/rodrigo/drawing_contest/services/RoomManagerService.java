@@ -138,10 +138,10 @@ public class RoomManagerService {
     }
 
     @Transactional
-    public Room setUserDraw(User user, byte[] drawSvg) {
+    public Room setUserDraw(User user, String svgDraw) {
         UUID roomId = this.roomPersistenceService.getRoomIdOfUser(user.getId());
         if (roomId == null)
-            throw new UserIsNotInAnyRoomException("cannot leave room because user {" + user.getId() + "} is not in any room");
+            throw new UserIsNotInAnyRoomException("cannot set draw because user {" + user.getUsername() + "} is not in any room");
 
         Room room = this.roomPersistenceService.findRoomById(roomId);
         if (room.getStatus() != RoomStatusEnum.PLAYING)
@@ -152,7 +152,7 @@ public class RoomManagerService {
                 .findFirst()
                 .orElseThrow(() -> new UserIsNotInThisRoomException("user {" + user.getUsername() + "} is not in this room"));
 
-        userRedis.setSvg(drawSvg);
+        userRedis.setSvgDraw(svgDraw);
         room.getUsers().replaceAll(u -> u.getUsername().equals(user.getUsername()) ? userRedis : u);
 
         return this.roomPersistenceService.saveRoom(room);
@@ -168,7 +168,7 @@ public class RoomManagerService {
 
         List<UserRedis> users = room.getUsers();
         for (UserRedis userRedis : users) {
-            if (userRedis.getSvg() == null) {
+            if (userRedis.getSvgDraw() == null) {
                 User user = this.userService.findUserByUsername(userRedis.getUsername());
                 System.out.println("disconnecting user: " + user.toString());
                 room = this.leaveRoom(user);

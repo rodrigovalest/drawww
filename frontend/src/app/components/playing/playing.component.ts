@@ -3,6 +3,8 @@ import { DrawingCanvasComponent } from "../drawing-canvas/drawing-canvas.compone
 import { RxStompService } from '../../services/rx-stomp.service';
 import { interval, Subscription } from 'rxjs';
 import { CompressionService } from '../../services/compression.service';
+import { DrawingService } from '../../services/drawing.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-playing',
@@ -19,7 +21,7 @@ export class PlayingComponent implements OnInit, OnDestroy {
 
   @ViewChild(DrawingCanvasComponent) drawingCanvasComponent!: DrawingCanvasComponent;
 
-  constructor(private rxStompService: RxStompService) {}
+  constructor(private rxStompService: RxStompService, private drawingService: DrawingService) {}
 
   ngOnInit(): void {
     this.rxStompService.getMessages$().subscribe(response => {
@@ -82,9 +84,15 @@ export class PlayingComponent implements OnInit, OnDestroy {
 
   private sendUserDraw() {
     const svgDraw: string = this.drawingCanvasComponent.getSVG();
-    const compressedDraw = CompressionService.compressSVG(svgDraw);
-    console.log("sending user draw... ", compressedDraw.byteLength);
-    console.log(compressedDraw)
-    this.rxStompService.sendUserDraw(compressedDraw);
+    // const draw = CompressionService.compressSVG(svgDraw);
+    // console.log("sending user draw... ", draw.byteLength);
+    console.log(svgDraw)
+
+    this.drawingService.sendUserDraw({ svgDraw: svgDraw }).subscribe({
+      next: (data) => {
+        console.log(data);
+      },
+      error: (httpError: HttpErrorResponse) => console.log(httpError)
+    });
   }
 }
