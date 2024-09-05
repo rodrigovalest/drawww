@@ -14,4 +14,13 @@ export class JwtService {
         return false;
     }
   }
+
+  static getUsernameByToken(token: string): string | null {
+    try {
+      const decodedToken: any = jwtDecode(token);
+      return decodedToken.sub || null;
+    } catch (error) {
+        return null;
+    }
+  }
 }

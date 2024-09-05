@@ -8,6 +8,7 @@ import { RxStompService } from '../../services/rx-stomp.service';
 import { IRoomEnter } from '../../interfaces/room-enter.interface';
 import { Router } from '@angular/router';
 import { BackIconComponent } from "../back-icon/back-icon.component";
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-enter-in-private-room',
@@ -22,7 +23,7 @@ export class EnterInPrivateRoomComponent implements OnInit {
     roomPassword: FormControl<string>; 
   }>;
 
-  constructor(private rxStompService: RxStompService, private router: Router) {
+  constructor(private authService: AuthService, private rxStompService: RxStompService, private router: Router) {
     this.roomForm = new FormGroup({
       roomId: new FormControl<string>('', { nonNullable: true, validators: [Validators.required] }),
       roomPassword: new FormControl<string>('', { nonNullable: true, validators: [Validators.required] }),
@@ -30,23 +31,19 @@ export class EnterInPrivateRoomComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.rxStompService.disconnect()
-
     this.rxStompService.getGameState$().subscribe(state => {
       console.log('ENTER IN ROOM GAME STATE: ', state);
     });
   }
   
   onEnter() {
-    if (!this.roomForm.valid) 
+    if (!this.roomForm.valid)
       return;
 
     const roomEnterData: IRoomEnter = this.roomForm.getRawValue();
-    const username = localStorage.getItem('username');
-    const password = localStorage.getItem('password');
-
-    this.rxStompService.connect(username || '', password || '');
-
+    const bearerToken = this.authService.getToken();
+    
+    this.rxStompService.connect(bearerToken || '');
     this.rxStompService.enterPrivateRoom(roomEnterData);
 
     this.rxStompService.getMessages$().subscribe(response => {

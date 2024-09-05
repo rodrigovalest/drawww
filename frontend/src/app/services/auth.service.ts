@@ -28,17 +28,23 @@ export class AuthService {
     return this.httpClient.get<IRefreshToken>(`${environment.httpApiUrl}/api/v1/users/refresh`, { headers: headers });
   }
 
-  setToken(token: string): void {
+  login(token: string, username: string): void {
     localStorage.setItem('token', token);
+    localStorage.setItem('username', username);
   }
 
   getToken(): string | null {
     return localStorage.getItem('token');
   }
 
+  getUsername(): string | null {
+    return localStorage.getItem('token');
+  }
+
   isLoggedIn(): boolean {
     const token = this.getToken();
-    if (token === null) return false;
+    const username = this.getUsername();
+    if (token === null || username === null) return false;
     if (!JwtService.isTokenValid(token)) return false;
     return true;
   }

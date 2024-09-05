@@ -6,6 +6,7 @@ import { IRoomCreate } from '../interfaces/room-create.interface';
 import { IRoomEnter } from '../interfaces/room-enter.interface';
 import { IWebSocketResponse } from '../interfaces/websocket-response.interface';
 import { GameStateType } from '../types/game-state.type';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +20,7 @@ export class RxStompService extends RxStomp {
     super();
   }
 
-  connect(username: string, password: string): void {
+  connect(bearerToken: string): void {
     this.disconnect();
 
     const config: RxStompConfig = {
@@ -28,8 +29,7 @@ export class RxStompService extends RxStomp {
       heartbeatOutgoing: 20000,
       reconnectDelay: 1000000000,
       connectHeaders: {
-        login: username,
-        passcode: password,
+        login: bearerToken
       },
       debug: msg => {
         // console.log(msg)

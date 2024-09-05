@@ -58,19 +58,6 @@ public class JwtService {
         }
     }
 
-    public boolean isTokenValid(String token) {
-        try {
-            Jwts.parserBuilder()
-                    .setSigningKey(Keys.hmacShaKeyFor(this.SECRET_KEY.getBytes(StandardCharsets.UTF_8)))
-                    .build()
-                    .parseClaimsJws(this.refactorToken(token));
-
-            return true;
-        } catch (JwtException e) {
-            return false;
-        }
-    }
-
     public String refreshToken(String oldToken) {
         try {
             this.validateToken(oldToken);
