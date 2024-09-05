@@ -31,6 +31,7 @@ public class RoomManagerService {
 
     private final UserService userService;
     private final RoomPersistenceService roomPersistenceService;
+    private final ThemeService themeService;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private final ApplicationEventPublisher eventPublisher;
     private static final int GAME_DURATION_MINUTES = 1;
@@ -125,6 +126,7 @@ public class RoomManagerService {
         room.setStatus(RoomStatusEnum.PLAYING);
         room.setStartTimePlaying(startTime);
         room.setEndTimePlaying(endTime);
+        room.setTheme(this.themeService.getRandomTheme());
 
         System.out.println("Starting game at: " + startTime + ". With end at: " + endTime);
 

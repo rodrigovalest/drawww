@@ -120,7 +120,7 @@ public class GameController {
         WebSocketDto<?> responseDto = new WebSocketDto<>(
                 room.getStatus(),
                 "All players are ready. Starting the game...",
-                new StartingMatchResponseDto("pizza", room.getStartTimePlaying(), room.getEndTimePlaying())
+                new StartingMatchResponseDto(room.getTheme(), room.getStartTimePlaying(), room.getEndTimePlaying())
         );
         room.getUsers().forEach(u -> this.template.convertAndSendToUser(u.getUsername(), "/queue/reply", responseDto));
     }
