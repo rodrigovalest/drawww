@@ -1,6 +1,7 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { RxStompService } from '../../services/rx-stomp.service';
 import { CompressionService } from '../../services/compression.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-voting',
@@ -12,10 +13,15 @@ export class VotingComponent {
   @ViewChild('canvas') canvas!: ElementRef<HTMLCanvasElement>;
   draw: string | null = null;
   theme: string = '';
-  username: string = '';
+  currentUsername: string = '';
   rate: string = '';
+  loggedInUsername: string = '';
 
-  constructor(private rxStompService: RxStompService) {}
+  constructor(private authService: AuthService, private rxStompService: RxStompService) {}
+
+  ngOnInit(): void {
+    this.loggedInUsername = this.authService.getUsername() || '';
+  }
 
   ngAfterViewInit(): void {
     this.rxStompService.getMessages$().subscribe(response => {
@@ -26,18 +32,10 @@ export class VotingComponent {
       
         switch (response.roomStatus) {
           case 'VOTING':
-            // const base64String = response.data.drawSvg;
-            // const binaryString = atob(base64String);
-
-            // const uint8Array = new Uint8Array(binaryString.length);
-            // for (let i = 0; i < binaryString.length; i++)
-            //   uint8Array[i] = binaryString.charCodeAt(i);
-
-            // this.draw = CompressionService.decompressSVG(uint8Array);
             this.draw = response.data.svgDraw;
-            console.log(this.draw);
-            this.username = response.data.targetUsername;
+            this.currentUsername = response.data.targetUsername;
             this.theme = response.data.theme;
+
             if (this.draw)
               this.renderSVG(this.draw);
             break;
