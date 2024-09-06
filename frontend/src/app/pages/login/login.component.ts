@@ -47,9 +47,7 @@ export class LoginComponent {
     const user: IUser = this.loginForm.getRawValue();
     this.authService.doLogin(user).subscribe({
       next: (data) => {
-        this.authService.setToken(data.token);
-        localStorage.setItem('username', user.username);
-        localStorage.setItem('password', user.password);
+        this.authService.login(data.token, user.username);
         this.router.navigate(['']);
       },
       error: (httpError: HttpErrorResponse) => console.log(httpError)

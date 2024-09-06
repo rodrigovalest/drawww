@@ -8,6 +8,7 @@ import { IRoomCreate } from '../../interfaces/room-create.interface';
 import { RxStompService } from '../../services/rx-stomp.service';
 import { Router } from '@angular/router';
 import { BackIconComponent } from "../../components/back-icon/back-icon.component";
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-create-private-room',
@@ -21,15 +22,13 @@ export class CreatePrivateRoomComponent implements OnInit {
     roomPassword: FormControl<string>; 
   }>;
 
-  constructor(private rxStompService: RxStompService, private router: Router) {
+  constructor(private authService: AuthService, private rxStompService: RxStompService, private router: Router) {
     this.roomForm = new FormGroup({
       roomPassword: new FormControl<string>('', { nonNullable: true, validators: [Validators.required] }),
     });
   }
 
   ngOnInit() {
-    this.rxStompService.disconnect()
-
     this.rxStompService.getGameState$().subscribe(state => {
       console.log('CREATE PRIVATE ROOM GAME STATE: ', state);
     });
@@ -38,12 +37,10 @@ export class CreatePrivateRoomComponent implements OnInit {
   onCreate() {
     if (!this.roomForm.valid) return;
 
+    const bearerToken = this.authService.getToken();
+    this.rxStompService.connect(bearerToken || '');
+
     const roomCreateData: IRoomCreate = this.roomForm.getRawValue();
-    const username = localStorage.getItem('username');
-    const password = localStorage.getItem('password');
-
-    this.rxStompService.connect(username || '', password || '');
-
     this.rxStompService.createPrivateRoom(roomCreateData);
 
     this.rxStompService.getMessages$().subscribe(response => {

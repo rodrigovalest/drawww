@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -43,7 +44,7 @@ public class RestExceptionHandler {
     private ResponseEntity<RestErrorDto> runtimeExceptionHandler(
             RuntimeException e
     ) {
-        log.info(String.valueOf(e.getCause()) + " | " + e.getMessage());
+        log.info(String.valueOf(e.getCause()) + " | " + e.getMessage() + " | " + e.getClass());
 
         RestErrorDto restErrorDto = new RestErrorDto(HttpStatus.INTERNAL_SERVER_ERROR, "something went wrong");
         return ResponseEntity
@@ -92,6 +93,50 @@ public class RestExceptionHandler {
         RestErrorDto restErrorDto = new RestErrorDto(HttpStatus.UNAUTHORIZED, e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(restErrorDto);
+    }
+
+    @ExceptionHandler(UserIsNotInAnyRoomException.class)
+    private ResponseEntity<RestErrorDto> userIsNotInAnyRoomExceptionHandler(
+            UserIsNotInAnyRoomException e
+    ) {
+        RestErrorDto restErrorDto = new RestErrorDto(HttpStatus.FORBIDDEN, e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(restErrorDto);
+    }
+
+    @ExceptionHandler(ActionDoNotMatchWithRoomStatusException.class)
+    private ResponseEntity<RestErrorDto> actionDoNotMatchWithRoomStatusExceptionHandler(
+            ActionDoNotMatchWithRoomStatusException e
+    ) {
+        RestErrorDto restErrorDto = new RestErrorDto(HttpStatus.CONFLICT, e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(restErrorDto);
+    }
+
+    @ExceptionHandler(UserIsNotInThisRoomException.class)
+    private ResponseEntity<RestErrorDto> userIsNotInThisRoomExceptionHandler(
+            UserIsNotInThisRoomException e
+    ) {
+        RestErrorDto restErrorDto = new RestErrorDto(HttpStatus.FORBIDDEN, e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(restErrorDto);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    private ResponseEntity<RestErrorDto> httpMessageNotReadableExceptionHandler(
+            HttpMessageNotReadableException e
+    ) {
+        RestErrorDto restErrorDto = new RestErrorDto(HttpStatus.BAD_REQUEST, e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(restErrorDto);
     }

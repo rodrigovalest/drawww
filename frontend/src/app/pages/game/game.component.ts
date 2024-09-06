@@ -30,7 +30,8 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    alert('sure you want to exit, some changes may be lost');
+    if (this.gameState !== 'RESULT' && this.gameState !== 'NOT_STARTED')
+      alert('sure you want to exit, some changes may be lost');
     this.rxStompService.disconnect();
   }
 }

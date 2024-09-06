@@ -3,7 +3,6 @@ package com.rodrigo.drawing_contest.controllers;
 import com.rodrigo.drawing_contest.dtos.websockets.WebSocketDto;
 import com.rodrigo.drawing_contest.dtos.websockets.request.CreatePrivateRoomRequestDto;
 import com.rodrigo.drawing_contest.dtos.websockets.request.EnterInPrivateRoomRequestDto;
-import com.rodrigo.drawing_contest.dtos.websockets.request.FinalDrawRequestDto;
 import com.rodrigo.drawing_contest.dtos.websockets.request.VoteRequestDto;
 import com.rodrigo.drawing_contest.dtos.websockets.response.*;
 import com.rodrigo.drawing_contest.events.StartPlayingEvent;
@@ -121,23 +120,9 @@ public class GameController {
         WebSocketDto<?> responseDto = new WebSocketDto<>(
                 room.getStatus(),
                 "All players are ready. Starting the game...",
-                new StartingMatchResponseDto("pizza", room.getStartTimePlaying(), room.getEndTimePlaying())
+                new StartingMatchResponseDto(room.getTheme(), room.getStartTimePlaying(), room.getEndTimePlaying())
         );
         room.getUsers().forEach(u -> this.template.convertAndSendToUser(u.getUsername(), "/queue/reply", responseDto));
-    }
-
-    @MessageMapping("/rooms/send_draw")
-    public void receiveUsersDraw(@Payload byte[] payload, Principal principal) {
-        System.out.println("receiving user draw: " + payload.length);
-        String username = principal.getName();
-        User user = this.userService.findUserByUsername(username);
-        Room room = this.roomManagerService.setUserDraw(user, payload);
-
-        WebSocketDto<?> responseDto = new WebSocketDto<>(
-                room.getStatus(),
-                "succesfully receive user draw"
-        );
-        this.template.convertAndSendToUser(username, "/queue/reply", responseDto);
     }
 
     @EventListener
@@ -145,12 +130,12 @@ public class GameController {
         Room room = event.getRoom();
         room = this.roomManagerService.startVotingForNextDrawing(room.getId());
         String targetUsername = room.getUsers().get(room.getCurrentVotingIndex()).getUsername();
-        byte[] drawSvg = room.getUsers().get(room.getCurrentVotingIndex()).getSvg();
+        String svgDraw = room.getUsers().get(room.getCurrentVotingIndex()).getSvgDraw();
 
         WebSocketDto<?> responseDto = new WebSocketDto<>(
                 room.getStatus(),
                 "Vote to " + targetUsername,
-                new VotingResponseDto(drawSvg, targetUsername, room.getTheme(), room.getStartTimeVoting(), room.getEndTimeVoting())
+                new VotingResponseDto(svgDraw, targetUsername, room.getTheme(), room.getStartTimeVoting(), room.getEndTimeVoting())
         );
         room.getUsers().forEach(u -> this.template.convertAndSendToUser(u.getUsername(), "/queue/reply", responseDto));
     }

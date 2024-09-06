@@ -14,16 +14,22 @@ import java.util.Collections;
 public class WebSocketAuthenticatorService {
 
     private final UserService userService;
+    private final JwtService jwtService;
 
     public UsernamePasswordAuthenticationToken getAuthenticatedOrFail(
-            final String  username, final String password
+            final String bearerToken
     ) throws AuthenticationException {
-        User user = this.userService.findUserByUsernameAndPassword(username, password);
+        try {
+            String username = this.jwtService.getUsernameByToken(bearerToken);
+            User user = this.userService.findUserByUsername(username);
 
-        return new UsernamePasswordAuthenticationToken(
-                user.getUsername(),
-                null,
-                Collections.singleton((GrantedAuthority) () -> "USER")
-        );
+            return new UsernamePasswordAuthenticationToken(
+                    user.getUsername(),
+                    null,
+                    Collections.singleton((GrantedAuthority) () -> "USER")
+            );
+        } catch (Exception e) {
+            throw new AuthenticationException("authentication fails because token is invalid") {};
+        }
     }
 }

@@ -12,7 +12,7 @@
 
         <div class="flex mb-4 max-w-[400px]">
             @for (user of users; track $index) {
-                <app-user-icon class="mr-2" />
+                <app-user-icon class="mr-2" [status]="user.status" />
             }
         </div>
         

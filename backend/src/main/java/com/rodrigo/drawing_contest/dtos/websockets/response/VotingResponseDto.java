@@ -8,7 +8,7 @@ import java.time.Instant;
 @AllArgsConstructor
 @Data
 public class VotingResponseDto {
-    private byte[] drawSvg;
+    private String svgDraw;
     private String targetUsername;
     private String theme;
     private Instant startTime;
