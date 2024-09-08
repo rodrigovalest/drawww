@@ -17,6 +17,7 @@ export class DrawingCanvasComponent implements OnInit {
   private isDrawing: boolean = false;
   currentTool: ToolType = 'PENCIL';
   currenPencilWidth: number = 3;
+  currentColor: string = '#000000';
 
   ngOnInit(): void {
     this.canvas = new fabric.Canvas(this.canvasElement.nativeElement, {
@@ -55,7 +56,7 @@ export class DrawingCanvasComponent implements OnInit {
     this.currentTool = 'PENCIL';
     this.canvas.freeDrawingBrush = new fabric.PencilBrush(this.canvas);
     this.canvas.freeDrawingBrush.width = this.currenPencilWidth;
-    this.canvas.freeDrawingBrush.color = '#000000';
+    this.canvas.freeDrawingBrush.color = this.currentColor;
   }
 
   onEraser() {
@@ -79,5 +80,11 @@ export class DrawingCanvasComponent implements OnInit {
 
     if (this.canvas.freeDrawingBrush)
       this.canvas.freeDrawingBrush.width = this.currenPencilWidth;
+  }
+
+  onColorSelect(color: string) {
+    this.currentColor = color;
+    if (this.canvas.freeDrawingBrush)
+      this.canvas.freeDrawingBrush.color = this.currentColor;
   }
 }
