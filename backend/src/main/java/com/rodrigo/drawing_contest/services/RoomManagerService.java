@@ -31,10 +31,12 @@ public class RoomManagerService {
 
     private final UserService userService;
     private final RoomPersistenceService roomPersistenceService;
+    private final ThemeService themeService;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private final ApplicationEventPublisher eventPublisher;
     private static final int GAME_DURATION_MINUTES = 1;
-    private static final int VOTING_DURATION_SECONDS = 45;
+    private static final int GAME_DURATION_SECONDS = 30;
+    private static final int VOTING_DURATION_SECONDS = 20;
 
     @Transactional
     public Room createPrivateRoom(User user, String password) {
@@ -120,11 +122,12 @@ public class RoomManagerService {
         if (!room.getUsers().stream().allMatch(userRedis -> userRedis.getStatus() == UserRedis.WaitingPlayerStatusEnum.READY))
             throw new CannotStartMatchBecauseNotAllUsersAreReadyException("cannot start game because not all users are READY");
 
-        Instant startTime = Instant.now().plus(Duration.ofSeconds(3));
-        Instant endTime = startTime.plus(Duration.ofMinutes(GAME_DURATION_MINUTES));
+        Instant startTime = Instant.now().plus(Duration.ofSeconds(1));
+        Instant endTime = startTime.plus(Duration.ofMinutes(GAME_DURATION_MINUTES)).plus(Duration.ofSeconds(GAME_DURATION_SECONDS));
         room.setStatus(RoomStatusEnum.PLAYING);
         room.setStartTimePlaying(startTime);
         room.setEndTimePlaying(endTime);
+        room.setTheme(this.themeService.getRandomTheme());
 
         System.out.println("Starting game at: " + startTime + ". With end at: " + endTime);
 
@@ -138,10 +141,10 @@ public class RoomManagerService {
     }
 
     @Transactional
-    public Room setUserDraw(User user, byte[] drawSvg) {
+    public Room setUserDraw(User user, String svgDraw) {
         UUID roomId = this.roomPersistenceService.getRoomIdOfUser(user.getId());
         if (roomId == null)
-            throw new UserIsNotInAnyRoomException("cannot leave room because user {" + user.getId() + "} is not in any room");
+            throw new UserIsNotInAnyRoomException("cannot set draw because user {" + user.getUsername() + "} is not in any room");
 
         Room room = this.roomPersistenceService.findRoomById(roomId);
         if (room.getStatus() != RoomStatusEnum.PLAYING)
@@ -152,7 +155,7 @@ public class RoomManagerService {
                 .findFirst()
                 .orElseThrow(() -> new UserIsNotInThisRoomException("user {" + user.getUsername() + "} is not in this room"));
 
-        userRedis.setSvg(drawSvg);
+        userRedis.setSvgDraw(svgDraw);
         room.getUsers().replaceAll(u -> u.getUsername().equals(user.getUsername()) ? userRedis : u);
 
         return this.roomPersistenceService.saveRoom(room);
@@ -168,7 +171,7 @@ public class RoomManagerService {
 
         List<UserRedis> users = room.getUsers();
         for (UserRedis userRedis : users) {
-            if (userRedis.getSvg() == null) {
+            if (userRedis.getSvgDraw() == null) {
                 User user = this.userService.findUserByUsername(userRedis.getUsername());
                 System.out.println("disconnecting user: " + user.toString());
                 room = this.leaveRoom(user);

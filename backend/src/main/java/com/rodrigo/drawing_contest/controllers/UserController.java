@@ -1,5 +1,6 @@
 package com.rodrigo.drawing_contest.controllers;
 
+import com.rodrigo.drawing_contest.dtos.http.response.RefreshBearerTokenResponseDto;
 import com.rodrigo.drawing_contest.models.user.User;
 import com.rodrigo.drawing_contest.services.JwtService;
 import com.rodrigo.drawing_contest.services.UserService;
@@ -34,5 +35,11 @@ public class UserController {
         User user = this.userService.createUser(dto.getUsername(), dto.getPassword());
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(user.getId()).toUri();
         return ResponseEntity.created(location).build();
+    }
+
+    @GetMapping("/refresh")
+    public ResponseEntity<RefreshBearerTokenResponseDto> refreshBearerToken(@RequestHeader("Authorization") String bearerToken) {
+        String newBearerToken = this.jwtService.refreshToken(bearerToken);
+        return ResponseEntity.ok(new RefreshBearerTokenResponseDto(newBearerToken));
     }
 }

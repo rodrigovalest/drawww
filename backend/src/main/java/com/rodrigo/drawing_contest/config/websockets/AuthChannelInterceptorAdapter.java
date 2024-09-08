@@ -25,13 +25,14 @@ public class AuthChannelInterceptorAdapter implements ChannelInterceptor {
     @Override
     public Message<?> preSend(final Message<?> message, final MessageChannel channel) throws AuthenticationException {
         final StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+        System.out.println(accessor.toString());
+        System.out.println(message.toString());
 
         if (StompCommand.CONNECT == accessor.getCommand()) {
-            final String username = accessor.getLogin();
-            final String password = accessor.getPasscode();
+            final String login = accessor.getLogin();
 
             final UsernamePasswordAuthenticationToken user = this.webSocketAuthenticatorService
-                    .getAuthenticatedOrFail(username, password);
+                    .getAuthenticatedOrFail(login);
 
             accessor.setUser(user);
         }

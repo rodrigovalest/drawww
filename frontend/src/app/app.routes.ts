@@ -9,6 +9,8 @@ import { PrivateRoomComponent } from './pages/private-room/private-room.componen
 import { GameComponent } from './pages/game/game.component';
 import { CreatePrivateRoomComponent } from './components/create-private-room/create-private-room.component';
 import { EnterInPrivateRoomComponent } from './components/enter-in-private-room/enter-in-private-room.component';
+import { PlayingComponent } from './components/playing/playing.component';
+import { DrawingCanvasComponent } from './components/drawing-canvas/drawing-canvas.component';
 
 export const routes: Routes = [
     { path: "", component: HomeComponent, canActivate: [authGuard] },
@@ -19,5 +21,6 @@ export const routes: Routes = [
     { path: "private/game", component: GameComponent, canActivate: [authGuard] },
     { path: "private/create", component: CreatePrivateRoomComponent, canActivate: [authGuard] },
     { path: "private/enter", component: EnterInPrivateRoomComponent, canActivate: [authGuard] },
+    { path: "test", component: DrawingCanvasComponent },
     { path: '**', component: PageNotFoundComponent }
 ];

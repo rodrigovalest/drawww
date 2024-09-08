@@ -1,3 +1,3 @@
 export interface ISendUserDraw {
-    draw: Uint8Array
+    svgDraw: string
 }

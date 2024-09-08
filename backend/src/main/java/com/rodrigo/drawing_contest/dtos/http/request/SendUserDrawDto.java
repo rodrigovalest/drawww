@@ -1,4 +1,4 @@
-package com.rodrigo.drawing_contest.dtos.websockets.request;
+package com.rodrigo.drawing_contest.dtos.http.request;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class FinalDrawRequestDto {
+public class SendUserDrawDto {
     @NotEmpty(message = "draw image must not be empty")
-    private byte[] draw;
+    private String svgDraw;
 }

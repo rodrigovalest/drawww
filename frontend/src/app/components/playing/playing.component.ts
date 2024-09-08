@@ -2,12 +2,14 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { DrawingCanvasComponent } from "../drawing-canvas/drawing-canvas.component";
 import { RxStompService } from '../../services/rx-stomp.service';
 import { interval, Subscription } from 'rxjs';
-import { CompressionService } from '../../services/compression.service';
+import { DrawingService } from '../../services/drawing.service';
+import { HttpErrorResponse } from '@angular/common/http';
+import { LoadingComponent } from "../loading/loading.component";
 
 @Component({
   selector: 'app-playing',
   standalone: true,
-  imports: [DrawingCanvasComponent],
+  imports: [DrawingCanvasComponent, LoadingComponent],
   templateUrl: './playing.component.html'
 })
 export class PlayingComponent implements OnInit, OnDestroy {
@@ -16,10 +18,11 @@ export class PlayingComponent implements OnInit, OnDestroy {
   time: string = '00:00';
   theme: string = '';
   private intervalSubscription: Subscription | null = null;
+  isLoading: boolean = false;
 
   @ViewChild(DrawingCanvasComponent) drawingCanvasComponent!: DrawingCanvasComponent;
 
-  constructor(private rxStompService: RxStompService) {}
+  constructor(private rxStompService: RxStompService, private drawingService: DrawingService) {}
 
   ngOnInit(): void {
     this.rxStompService.getMessages$().subscribe(response => {
@@ -38,7 +41,7 @@ export class PlayingComponent implements OnInit, OnDestroy {
             this.updateTime();
             break;
           case 'ERROR':
-            alert('ERROR in playing: ' + response.message);
+            console.error('ERROR in playing: ', response.message);
             break;
           default:
             console.error("Unexpected message: ", response);
@@ -62,7 +65,7 @@ export class PlayingComponent implements OnInit, OnDestroy {
       this.time = this.formatTime(timeLeft);
 
       if (timeLeft === 0) {
-        console.log("sending user draw. time left: ", this.time, " ", timeLeft);
+        this.isLoading = true;
         this.sendUserDraw();
 
         if (this.intervalSubscription)
@@ -82,9 +85,12 @@ export class PlayingComponent implements OnInit, OnDestroy {
 
   private sendUserDraw() {
     const svgDraw: string = this.drawingCanvasComponent.getSVG();
-    const compressedDraw = CompressionService.compressSVG(svgDraw);
-    console.log("sending user draw... ", compressedDraw.byteLength);
-    console.log(compressedDraw)
-    this.rxStompService.sendUserDraw(compressedDraw);
+
+    this.drawingService.sendUserDraw({ svgDraw: svgDraw }).subscribe({
+      next: (data) => {
+        console.log(data);
+      },
+      error: (httpError: HttpErrorResponse) => console.log(httpError)
+    });
   }
 }
