@@ -1,7 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import * as fabric from 'fabric';
-
-export type ToolType = 'PENCIL' | 'ERASER' | 'TRIANGLE' | 'SQUARE' | 'CIRCLE' | 'LINE';
+import { ToolType } from '../../types/tool.type';
 
 @Component({
   selector: 'app-drawing-canvas',
