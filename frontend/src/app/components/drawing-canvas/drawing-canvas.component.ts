@@ -19,6 +19,9 @@ export class DrawingCanvasComponent implements OnInit {
   currenPencilWidth: number = 3;
   currentColor: string = '#000000';
 
+  private undoStack: string[] = [];
+  private redoStack: string[] = [];
+
   ngOnInit(): void {
     this.canvas = new fabric.Canvas(this.canvasElement.nativeElement, {
       isDrawingMode: true,
@@ -30,6 +33,7 @@ export class DrawingCanvasComponent implements OnInit {
       this.isDrawing = true;
       const pointer = this.canvas.getScenePoint(e.e);
       this.canvas.freeDrawingBrush?.onMouseDown(pointer, e);
+      this.saveState();
     });
 
     this.canvas.on('mouse:up', e => {
@@ -52,7 +56,6 @@ export class DrawingCanvasComponent implements OnInit {
   }
 
   onPencil() {
-    console.log('on pencil')
     this.currentTool = 'PENCIL';
     this.canvas.freeDrawingBrush = new fabric.PencilBrush(this.canvas);
     this.canvas.freeDrawingBrush.width = this.currenPencilWidth;
@@ -60,19 +63,10 @@ export class DrawingCanvasComponent implements OnInit {
   }
 
   onEraser() {
-    console.log('on eraser')
     this.canvas.freeDrawingBrush = new fabric.PencilBrush(this.canvas);
     this.canvas.freeDrawingBrush.width = 65;
     this.canvas.freeDrawingBrush.color = '#f8f8f8';
     this.currentTool = 'ERASER';
-  }
-
-  onUndo() {
-    console.log('on undo')
-  }
-
-  onRedo() {
-    console.log('on redo')
   }
 
   onWidthChange(width: number) {
@@ -84,7 +78,37 @@ export class DrawingCanvasComponent implements OnInit {
 
   onColorSelect(color: string) {
     this.currentColor = color;
+
     if (this.canvas.freeDrawingBrush)
       this.canvas.freeDrawingBrush.color = this.currentColor;
+  }
+
+  saveState() {
+    this.undoStack.push(JSON.stringify(this.canvas.toJSON()));
+    this.redoStack = [];
+  }
+
+  onUndo() {
+    if (this.undoStack.length > 0) {
+      this.redoStack.push(JSON.stringify(this.canvas.toObject()));
+      const lastState = this.undoStack.pop();
+
+      if (lastState) {
+        this.canvas.clear();
+        this.canvas.loadFromJSON(lastState);
+      }
+    }
+  }
+
+  onRedo() {
+    if (this.redoStack.length > 0) {
+      this.undoStack.push(JSON.stringify(this.canvas.toObject()));
+      const lastState = this.redoStack.pop();
+
+      if (lastState) {
+        this.canvas.clear();
+        this.canvas.loadFromJSON(lastState);
+      }
+    }
   }
 }
