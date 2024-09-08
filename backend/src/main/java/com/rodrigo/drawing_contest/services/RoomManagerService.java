@@ -35,7 +35,8 @@ public class RoomManagerService {
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private final ApplicationEventPublisher eventPublisher;
     private static final int GAME_DURATION_MINUTES = 1;
-    private static final int VOTING_DURATION_SECONDS = 45;
+    private static final int GAME_DURATION_SECONDS = 30;
+    private static final int VOTING_DURATION_SECONDS = 20;
 
     @Transactional
     public Room createPrivateRoom(User user, String password) {
@@ -121,8 +122,8 @@ public class RoomManagerService {
         if (!room.getUsers().stream().allMatch(userRedis -> userRedis.getStatus() == UserRedis.WaitingPlayerStatusEnum.READY))
             throw new CannotStartMatchBecauseNotAllUsersAreReadyException("cannot start game because not all users are READY");
 
-        Instant startTime = Instant.now().plus(Duration.ofSeconds(3));
-        Instant endTime = startTime.plus(Duration.ofMinutes(GAME_DURATION_MINUTES));
+        Instant startTime = Instant.now().plus(Duration.ofSeconds(1));
+        Instant endTime = startTime.plus(Duration.ofMinutes(GAME_DURATION_MINUTES)).plus(Duration.ofSeconds(GAME_DURATION_SECONDS));
         room.setStatus(RoomStatusEnum.PLAYING);
         room.setStartTimePlaying(startTime);
         room.setEndTimePlaying(endTime);
