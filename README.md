@@ -4,6 +4,9 @@
 
 Drawww is a real-time multiplayer web application developed with Angular and Java Spring Boot. Players compete in various drawing challenges where they are assigned prompts, create drawings, and then vote on each other's artwork.
 
+![waiting screen](docs/waiting.png)
+![playing screen](docs/playing.png)
+
 ## Tech Stack and Architecture
 
 - **Frontend:** Angular v11, RxStompService, Fabric.js, Tailwind CSS
